@@ -22,7 +22,11 @@
   "dependencies": {
     "dotenv": "8.2.0",
     "fp-ts": "2.9.5",
-    "module-alias": "2.2.2"
+    "io-ts": "2.2.16",
+    "io-ts-types": "0.5.16",
+    "module-alias": "2.2.2",
+    "monocle-ts": "2.3.10",
+    "newtype-ts": "0.3.4"
   },
   "devDependencies": {
     "@types/jest": "26.0.22",

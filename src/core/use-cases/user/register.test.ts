@@ -2,6 +2,7 @@ import * as TE from 'fp-ts/TaskEither'
 import { pipe } from 'fp-ts/function'
 import { register, OutsideRegister } from './register'
 import { CreateUser } from '@/core/types/user'
+import { unsafeEmail } from '@/config/tests/fixtures'
 
 const registerOk: OutsideRegister<string> = async (data) => {
   return `Usuário ${data.username} cadastrado com sucesso!`
@@ -9,7 +10,7 @@ const registerOk: OutsideRegister<string> = async (data) => {
 
 const data: CreateUser = {
   username: 'john',
-  email: 'john@doe.com',
+  email: unsafeEmail('john@doe.com'),
   password: 'jhon123!',
 }
 
