@@ -1,4 +1,4 @@
-import { emailCodec } from '@/core/types/scalar'
+import { emailCodec, urlCodec } from '@/core/types/scalar'
 import * as t from 'io-ts'
 
 export const userCodec = t.type({
@@ -6,7 +6,7 @@ export const userCodec = t.type({
   token: t.string,
   username: t.string,
   bio: t.string,
-  image: t.string,
+  image: urlCodec,
 })
 
 export type User = t.TypeOf<typeof userCodec>

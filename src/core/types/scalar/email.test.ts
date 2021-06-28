@@ -1,12 +1,12 @@
-import { emailCodec } from './email'
-import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
+import { mapAllE } from '@/config/tests/fixtures'
+import { emailCodec } from './email'
 
 it('Deveria validar o email corretamente', () => {
   pipe(
     'john@doe.com',
     emailCodec.decode,
-    E.map(result => expect(result).toBe('john@doe.com')),
+    mapAllE(result => expect(result).toBe('john@doe.com')),
   )
 })
 
