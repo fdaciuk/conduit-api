@@ -1,15 +1,16 @@
 import { profileCodec } from '@/core/types/profile'
 import { tagCodec } from '@/core/types/tag'
+import { slugCodec, dateCodec } from '@/core/types/scalar'
 import * as t from 'io-ts'
 
 export const articleCodec = t.type({
-  slug: t.string,
+  slug: slugCodec,
   title: t.string,
   description: t.string,
   body: t.string,
   tagList: t.array(tagCodec),
-  createdAt: t.string,
-  updatedAt: t.string,
+  createdAt: dateCodec,
+  updatedAt: dateCodec,
   favorited: t.boolean,
   favoritesCount: t.number,
   author: profileCodec,
