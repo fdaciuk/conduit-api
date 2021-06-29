@@ -14,6 +14,9 @@ it('Deveria retornar um erro quando o email for inválido', () => {
   pipe(
     'invalid-email',
     emailCodec.decode,
-    E.mapLeft(error => expect(error[0]?.message).toBe('Invalid email')),
+    mapAllE(error => {
+      const errorMessage: string = Array.isArray(error) ? error[0]?.message : ''
+      expect(errorMessage).toBe('Invalid email')
+    }),
   )
 })
