@@ -1,22 +1,22 @@
+import * as TE from 'fp-ts/TaskEither'
 import { pipe } from 'fp-ts/function'
-import { mapAllE } from '@/config/tests/fixtures'
+import { mapAll, getErrorMessage } from '@/config/tests/fixtures'
 import { emailCodec } from './email'
 
-it('Deveria validar o email corretamente', () => {
-  pipe(
+it('Deveria validar o email corretamente', async () => {
+  return pipe(
     'john@doe.com',
     emailCodec.decode,
-    mapAllE(result => expect(result).toBe('john@doe.com')),
-  )
+    TE.fromEither,
+    mapAll(result => expect(result).toBe('john@doe.com')),
+  )()
 })
 
-it('Deveria retornar um erro quando o email for inválido', () => {
-  pipe(
+it('Deveria retornar um erro quando o email for inválido', async () => {
+  return pipe(
     'invalid-email',
     emailCodec.decode,
-    mapAllE(error => {
-      const errorMessage: string = Array.isArray(error) ? error[0]?.message : ''
-      expect(errorMessage).toBe('Invalid email')
-    }),
-  )
+    TE.fromEither,
+    mapAll(errors => expect(getErrorMessage(errors)).toBe('Invalid email')),
+  )()
 })
