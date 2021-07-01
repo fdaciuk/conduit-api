@@ -1,5 +1,7 @@
 import * as t from 'io-ts'
 import { withMessage } from 'io-ts-types'
+import { pipe, constTrue, constFalse } from 'fp-ts/function'
+import * as E from 'fp-ts/Either'
 import { URL } from 'url'
 
 type UrlBrand = {
@@ -18,10 +20,11 @@ export const urlCodec = withMessage(
 export type Url = t.TypeOf<typeof urlCodec>
 
 function isUrl (input: unknown) {
-  try {
-    const url = new URL(typeof input === 'string' ? input : '')
-    return !!url
-  } catch {
-    return false
-  }
+  return pipe(
+    E.tryCatch(
+      () => new URL(typeof input === 'string' ? input : ''),
+      E.toError,
+    ),
+    E.fold(constFalse, constTrue),
+  )
 }
