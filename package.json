@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "dotenv": "8.2.0",
+    "express": "4.17.1",
     "fp-ts": "2.9.5",
     "io-ts": "2.2.16",
     "io-ts-types": "0.5.16",
@@ -29,6 +30,7 @@
     "newtype-ts": "0.3.4"
   },
   "devDependencies": {
+    "@types/express": "4.17.12",
     "@types/jest": "26.0.22",
     "@types/module-alias": "2.0.0",
     "@types/node": "14.14.41",
