@@ -4,7 +4,7 @@ import * as TE from 'fp-ts/TaskEither'
 import {
   register,
   OutsideRegisterType,
-} from '@/adapters/user/register-adapter'
+} from '@/adapters/use-cases/user/register-adapter'
 
 const app = express()
 
