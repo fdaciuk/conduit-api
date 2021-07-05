@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/function'
 import { mapAll, getErrorMessage } from '@/config/tests/fixtures'
 import { urlCodec } from './url'
 
-it('Deveria validar a url corretamente', async () => {
+it('Should validate the URL properly', async () => {
   return pipe(
     'https://url.com',
     urlCodec.decode,
@@ -12,7 +12,7 @@ it('Deveria validar a url corretamente', async () => {
   )()
 })
 
-it('Deveria retornar um erro quando a URL for inválida', async () => {
+it('Should not accept an invalid URL', async () => {
   return pipe(
     'invalid-url',
     urlCodec.decode,
