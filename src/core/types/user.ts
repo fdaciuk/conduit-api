@@ -11,7 +11,7 @@ const userCodecRequired = t.type({
   username: slugCodec,
 })
 
-const userCodecPartial = t.partial({
+const userCodecOptional = t.partial({
   token: t.string,
   bio: t.string,
   image: urlCodec,
@@ -19,7 +19,7 @@ const userCodecPartial = t.partial({
 
 export const userCodec = t.intersection([
   userCodecRequired,
-  userCodecPartial,
+  userCodecOptional,
 ])
 
 export type User = t.TypeOf<typeof userCodec>
