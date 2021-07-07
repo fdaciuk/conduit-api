@@ -1,5 +1,6 @@
 import { profileCodec } from '@/core/types/profile'
 import { tagCodec } from '@/core/types/tag'
+import { withMessage } from 'io-ts-types'
 import { slugCodec, dateCodec, positiveCodec } from '@/core/types/scalar'
 import * as t from 'io-ts'
 
@@ -26,9 +27,9 @@ export const articlesCodec = t.type({
 export type Articles = t.TypeOf<typeof articlesCodec>
 
 const createArticleCodecRequired = t.type({
-  title: t.string,
-  description: t.string,
-  body: t.string,
+  title: withMessage(t.string, () => 'Invalid title'),
+  description: withMessage(t.string, () => 'Invalid description'),
+  body: withMessage(t.string, () => 'Invalid body'),
 })
 
 const createArticleCodecOptional = t.partial({
