@@ -3,10 +3,10 @@ import {
   OutsideRegister,
   RegisterArticle,
 } from '@/core/use-cases/article/register-article'
-import { Article } from '@/core/types/article'
+import { ArticleOutput } from '@/core/types/article'
 
 export type OutsideRegisterType = OutsideRegister<{
-  article: Article
+  article: ArticleOutput
 }>
 
 export const registerArticle: RegisterArticle = (outsideRegister) => (data) =>

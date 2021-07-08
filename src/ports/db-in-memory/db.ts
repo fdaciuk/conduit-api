@@ -1,10 +1,10 @@
+import slugify from 'slugify'
 import {
   OutsideRegisterType,
 } from '@/adapters/use-cases/user/register-user-adapter'
 import {
   OutsideRegisterType as OutsideRegisterArticle,
 } from '@/adapters/use-cases/article/register-article-adapter'
-import slugify from 'slugify'
 
 export const outsideRegister: OutsideRegisterType = async (data) => {
   return {
