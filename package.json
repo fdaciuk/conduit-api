@@ -27,7 +27,8 @@
     "io-ts-types": "0.5.16",
     "module-alias": "2.2.2",
     "monocle-ts": "2.3.10",
-    "newtype-ts": "0.3.4"
+    "newtype-ts": "0.3.4",
+    "slugify": "1.5.3"
   },
   "devDependencies": {
     "@types/express": "4.17.12",

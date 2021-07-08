@@ -1,21 +1,29 @@
 import { profileCodec } from '@/core/types/profile'
 import { tagCodec } from '@/core/types/tag'
 import { withMessage } from 'io-ts-types'
-import { slugCodec, dateCodec, positiveCodec } from '@/core/types/scalar'
+import { positiveCodec } from '@/core/types/scalar'
 import * as t from 'io-ts'
 
-export const articleCodec = t.type({
-  slug: slugCodec,
+const articleCodecRequired = t.type({
+  slug: t.string,
   title: t.string,
   description: t.string,
   body: t.string,
-  tagList: t.array(tagCodec),
-  createdAt: dateCodec,
-  updatedAt: dateCodec,
+  tagList: t.array(t.string),
+  createdAt: t.string,
+  updatedAt: t.string,
   favorited: t.boolean,
-  favoritesCount: positiveCodec,
+  favoritesCount: t.number,
+})
+
+const articleCodecOptional = t.partial({
   author: profileCodec,
 })
+
+export const articleCodec = t.intersection([
+  articleCodecRequired,
+  articleCodecOptional,
+])
 
 export type Article = t.TypeOf<typeof articleCodec>
 
