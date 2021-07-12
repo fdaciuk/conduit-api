@@ -1,6 +1,6 @@
 import {
-  register as registerCore,
-  Register,
+  registerUser as registerUserCore,
+  RegisterUser,
   OutsideRegister,
 } from '@/core/use-cases/user/register-user'
 import { User } from '@/core/types/user'
@@ -9,5 +9,5 @@ export type OutsideRegisterType = OutsideRegister<{
   user: User
 }>
 
-export const register: Register = (outsideRegister) => (data) =>
-  registerCore(outsideRegister)(data)
+export const registerUser: RegisterUser = (outsideRegister) => (data) =>
+  registerUserCore(outsideRegister)(data)

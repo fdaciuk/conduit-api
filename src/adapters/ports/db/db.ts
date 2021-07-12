@@ -9,10 +9,10 @@ import {
   OutsideRegisterType as OutsideRegisterArticle,
 } from '@/adapters/use-cases/article/register-article-adapter'
 
-export const userRegister: OutsideRegisterType = (data) => {
+export const createUserInDB: OutsideRegisterType = (data) => {
   return outsideRegister(data)
 }
 
-export const articleRegister: OutsideRegisterArticle = (data) => {
+export const createArticleInDB: OutsideRegisterArticle = (data) => {
   return outsideRegisterArticle(data)
 }

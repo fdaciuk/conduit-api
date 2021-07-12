@@ -1,11 +1,15 @@
 import express, { Request, Response } from 'express'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
-import { register } from '@/adapters/use-cases/user/register-user-adapter'
-import { registerArticle } from '@/adapters/use-cases/article/register-article-adapter'
 import {
-  userRegister,
-  articleRegister as createArticleInDB,
+  registerUser,
+} from '@/adapters/use-cases/user/register-user-adapter'
+import {
+  registerArticle,
+} from '@/adapters/use-cases/article/register-article-adapter'
+import {
+  createUserInDB,
+  createArticleInDB,
 } from '@/adapters/ports/db'
 
 const app = express()
@@ -19,7 +23,7 @@ app.use(express.urlencoded({ extended: true }))
 app.post('/api/users', async (req: Request, res: Response) => {
   return pipe(
     req.body.user,
-    register(userRegister),
+    registerUser(createUserInDB),
     TE.map(result => res.json(result)),
     TE.mapLeft(error => res.status(422).json(getError(error.message))),
   )()
