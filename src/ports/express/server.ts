@@ -11,10 +11,11 @@ import {
   createUserInDB,
   createArticleInDB,
 } from '@/adapters/ports/db'
+import { env } from '@/helpers'
 
 const app = express()
 
-const PORT = process.env.PORT
+const PORT = env('PORT')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
