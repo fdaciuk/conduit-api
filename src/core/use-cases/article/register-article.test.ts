@@ -1,7 +1,11 @@
 import { pipe } from 'fp-ts/function'
 import { CreateArticle } from '@/core/types/article'
 import { registerArticle, OutsideRegister } from './register-article'
-import { mapAll, unsafeSlug, unsafeString } from '@/config/tests/fixtures'
+import { mapAll, unsafe } from '@/config/tests/fixtures'
+import { Slug } from '@/core/types/scalar'
+
+const unsafeSlug = (value: unknown) => unsafe<Slug>(value)
+const unsafeString = (value: unknown) => unsafe<string>(value)
 
 const data: CreateArticle = {
   title: 'Article title',

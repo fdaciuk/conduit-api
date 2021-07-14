@@ -1,12 +1,12 @@
 import { pipe } from 'fp-ts/function'
 import { registerUser, OutsideRegister } from './register-user'
 import { CreateUser } from '@/core/types/user'
-import {
-  unsafeEmail,
-  unsafePassword,
-  unsafeSlug,
-  mapAll,
-} from '@/config/tests/fixtures'
+import { mapAll, unsafe } from '@/config/tests/fixtures'
+import { Email, Password, Slug } from '@/core/types/scalar'
+
+const unsafeEmail = (value: unknown) => unsafe<Email>(value)
+const unsafeSlug = (value: unknown) => unsafe<Slug>(value)
+const unsafePassword = (value: unknown) => unsafe<Password>(value)
 
 const registerOk: OutsideRegister<string> = async (data) => {
   return `Usuário ${data.username} cadastrado com sucesso!`
