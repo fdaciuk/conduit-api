@@ -1,10 +1,16 @@
 import slugify from 'slugify'
+
 import {
   OutsideRegisterType,
 } from '@/adapters/use-cases/user/register-user-adapter'
+
 import {
   OutsideRegisterType as OutsideRegisterArticle,
 } from '@/adapters/use-cases/article/register-article-adapter'
+
+import {
+  OutsideCreateCommentType,
+} from '@/adapters/use-cases/article/add-comment-to-an-article-adapter'
 
 export const outsideRegister: OutsideRegisterType = async (data) => {
   return {
@@ -32,6 +38,26 @@ export const outsideRegisterArticle: OutsideRegisterArticle = async (data) => {
       updatedAt: date,
       favorited: false,
       favoritesCount: 0,
+      // author: {
+      //   "username": "jake",
+      //   "bio": "I work at statefarm",
+      //   "image": "https://i.stack.imgur.com/xHWG8.jpg",
+      //   "following": false
+      // }
+    },
+  }
+}
+
+export const outsideCreateComment: OutsideCreateCommentType = async (data) => {
+  const date = new Date().toISOString()
+
+  return {
+    comment: {
+      // TODO: Usar uuid
+      id: Date.now(),
+      createdAt: date,
+      updatedAt: date,
+      body: data.body,
       // author: {
       //   "username": "jake",
       //   "bio": "I work at statefarm",

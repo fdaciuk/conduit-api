@@ -6,7 +6,7 @@ import { CreateComment, createCommentCodec } from '@/core/types/comment'
 
 export type OutsideCreateComment<A> = (data: CreateComment) => Promise<A>
 
-type AddCommentToAnArticle = <A>(o: OutsideCreateComment<A>) =>
+export type AddCommentToAnArticle = <A>(o: OutsideCreateComment<A>) =>
   (data: CreateComment) => TE.TaskEither<Error, A>
 
 export const addCommentToAnArticle: AddCommentToAnArticle = (outsideCreateComment) => (data) => {
