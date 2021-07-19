@@ -1,14 +1,10 @@
-import {
-  addCommentToAnArticle as addCommentToAnArticleCore,
-  AddCommentToAnArticle,
-  OutsideCreateComment,
-} from '@/core/use-cases/article/create-comment'
+import * as comment from '@/core/use-cases/article/create-comment'
 import { CommentOutput } from '@/core/types/comment'
 
-export type OutsideCreateCommentType = OutsideCreateComment<{
+export type OutsideCreateComment = comment.OutsideCreateComment<{
   comment: CommentOutput
 }>
 
-export const addCommentToAnArticle: AddCommentToAnArticle = (outsideCreateComment) => (data) => {
-  return addCommentToAnArticleCore(outsideCreateComment)(data)
+export const addCommentToAnArticle: comment.AddCommentToAnArticle = (outsideCreateComment) => (data) => {
+  return comment.addCommentToAnArticle(outsideCreateComment)(data)
 }

@@ -1,29 +1,16 @@
-import {
-  outsideRegister,
-  outsideRegisterArticle,
-  outsideCreateComment,
-} from '@/ports/db-in-memory/db'
+import * as user from '@/adapters/use-cases/user/register-user-adapter'
+import * as article from '@/adapters/use-cases/article/register-article-adapter'
+import * as comment from '@/adapters/use-cases/article/add-comment-to-an-article-adapter'
+import * as db from '@/ports/db-in-memory/db'
 
-import {
-  OutsideRegisterType,
-} from '@/adapters/use-cases/user/register-user-adapter'
-
-import {
-  OutsideRegisterType as OutsideRegisterArticle,
-} from '@/adapters/use-cases/article/register-article-adapter'
-
-import {
-  OutsideCreateCommentType,
-} from '@/adapters/use-cases/article/add-comment-to-an-article-adapter'
-
-export const createUserInDB: OutsideRegisterType = (data) => {
-  return outsideRegister(data)
+export const createUserInDB: user.OutsideRegisterUser = (data) => {
+  return db.outsideRegisterUser(data)
 }
 
-export const createArticleInDB: OutsideRegisterArticle = (data) => {
-  return outsideRegisterArticle(data)
+export const createArticleInDB: article.OutsideRegisterArticle = (data) => {
+  return db.outsideRegisterArticle(data)
 }
 
-export const addCommentToAnArticleInDB: OutsideCreateCommentType = (data) => {
-  return outsideCreateComment(data)
+export const addCommentToAnArticleInDB: comment.OutsideCreateComment = (data) => {
+  return db.outsideCreateComment(data)
 }
