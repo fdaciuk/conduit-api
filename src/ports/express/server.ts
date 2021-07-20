@@ -24,6 +24,10 @@ const PORT = env('PORT')
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+app
+  .disable('x-powered-by')
+  .disable('etag')
+
 // public
 app.post('/api/users', async (req: Request, res: Response) => {
   return pipe(
