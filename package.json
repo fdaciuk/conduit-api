@@ -17,7 +17,8 @@
     "lint:fix": "eslint --fix . --ext js,ts",
     "type-check": "tsc --project tsconfig.json --pretty --noEmit",
     "prepare": "husky install",
-    "build": "tsc"
+    "build": "tsc",
+    "ci": "yarn lint && yarn type-check && yarn test"
   },
   "dependencies": {
     "dotenv": "8.2.0",
