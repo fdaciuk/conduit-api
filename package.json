@@ -1,8 +1,8 @@
 {
-  "name": "nodejs-graphql-fp",
+  "name": "conduit-api",
   "version": "0.1.0",
   "main": "index.js",
-  "repository": "git@github.com:fdaciuk/nodejs-graphql-fp.git",
+  "repository": "git@github.com:fdaciuk/conduit-api.git",
   "author": "Fernando Daciuk - @fdaciuk",
   "license": "MIT",
   "private": true,
