@@ -59,7 +59,7 @@ This project uses Hexagonal Architecture (Ports & Adapters) with Functional Prog
 │   │   └── use-cases
 │   ├── index.ts
 │   └── app.ts
-├── environment.d.ts
+├── .env.example
 ├── jest.config.integration.js
 └── jest.config.js
 ```
@@ -77,7 +77,7 @@ This project uses Hexagonal Architecture (Ports & Adapters) with Functional Prog
 | `src/core/types`             | Start point for modelling your app with TypeScript types.                                                                      |
 | `src/core/use-cases`         | Here you can put your functions with business rules.                                                                           |
 | `src/ports`                  | Anything with external world contact. When you need to access something on `core`, you must use an `adapter`.                  |
-| `environment.d.ts`           | List of Environment Variables for TypeScript autocomplete                                                                      |
+| `.env.example`               | List of Environment Variables. Please, copy this file and create a new `.env` file to use Env Vars.                            |
 | `jest.config.integration.js` | Jest configuration file for integration tests                                                                                  |
 | `jest.config.js`             | Main Jest configuration file                                                                                                   |
 
@@ -85,9 +85,9 @@ This project uses Hexagonal Architecture (Ports & Adapters) with Functional Prog
 
 ### Environment Variables
 
-You can use env vars by creating a `.env` file on the root of the project.
-To document all used env vars, and get autocomplete when use `process.env.YOU_VAR`,
-just put all your env vars on file `environment.d.ts`.
+You can use env vars by copying the `.env.example` file to a new `.env` file on the root of the project.
+To document all used env vars, and get autocomplete when use the function `env('YOU_VAR')`,
+just put all your env vars on file `src/helpers/env.ts`.
 
 ### Global import
 

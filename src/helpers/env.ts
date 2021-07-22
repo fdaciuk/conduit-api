@@ -3,7 +3,11 @@ import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
 import { withMessage, NonEmptyString } from 'io-ts-types'
 
-export const env = (value: string) => {
+type Envs =
+  | 'PORT'
+  | 'JWT_SECRET'
+
+export const env = (value: Envs) => {
   const envCodec = withMessage(
     NonEmptyString,
     () => `You must set the env var ${value}`,
