@@ -2,7 +2,7 @@ import * as TE from 'fp-ts/TaskEither'
 import { pipe } from 'fp-ts/function'
 
 export function unsafe <T> (value: unknown): T {
-  return value as any
+  return value as T
 }
 
 type Callback = (a: unknown) => unknown

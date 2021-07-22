@@ -1,4 +1,3 @@
-import { NonEmptyString } from 'io-ts-types'
 import { pipe } from 'fp-ts/function'
 import {
   addCommentToAnArticle,
@@ -8,11 +7,11 @@ import { CreateComment } from '@/core/types/comment'
 import { mapAll, unsafe } from '@/config/tests/fixtures'
 
 const data: CreateComment = {
-  body: unsafe<NonEmptyString>('Comment for an article'),
+  body: unsafe('Comment for an article'),
 }
 
 const dataFail: CreateComment = {
-  body: unsafe<NonEmptyString>(''),
+  body: unsafe(''),
 }
 
 const registerOk: OutsideCreateComment<string> = async (data) => {
