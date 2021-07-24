@@ -1,19 +1,38 @@
 import slugify from 'slugify'
+import { v4 as uuidv4 } from 'uuid'
 
 import * as user from '@/adapters/use-cases/user/register-user-adapter'
 import * as article from '@/adapters/use-cases/article/register-article-adapter'
 import * as comment from '@/adapters/use-cases/article/add-comment-to-an-article-adapter'
 
-export const outsideRegisterUser: user.OutsideRegisterUser = async (data) => {
-  return {
-    user: {
-      email: data.email,
-      token: '',
-      username: data.username,
-      bio: '',
-      image: undefined,
-    },
+type DBUser = user.User & {
+  id: string
+  password: string
+}
+
+type DB = {
+  users: {
+    [id: string]: DBUser
   }
+}
+
+const db: DB = {
+  users: {},
+}
+
+type OutsideRegisterUser = (data: user.CreateUser) => Promise<DBUser | undefined>
+
+export const outsideRegisterUser: OutsideRegisterUser = async (data) => {
+  const id = uuidv4()
+
+  db.users[id] = {
+    id,
+    email: data.email,
+    username: data.username,
+    password: data.password,
+  }
+
+  return db.users[id]
 }
 
 export const outsideRegisterArticle: article.OutsideRegisterArticle = async (data) => {

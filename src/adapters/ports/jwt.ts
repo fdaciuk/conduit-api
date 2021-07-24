@@ -4,6 +4,8 @@ type JWTPayload = {
   [propName: string]: unknown
 }
 
-export const generateToken = (...args: [JWTPayload, string?]) => {
+type ExpirationTime = string
+
+export const generateToken = (...args: [JWTPayload, ExpirationTime?]) => {
   return jwt.createJWT(...args)
 }
