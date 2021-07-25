@@ -16,6 +16,7 @@ import {
   addCommentToAnArticleInDB,
 } from '@/adapters/ports/db'
 import { env } from '@/helpers'
+import { verifyToken } from '@/adapters/ports/jwt'
 
 const app = express()
 
@@ -38,10 +39,27 @@ app.post('/api/users', async (req: Request, res: Response) => {
   )()
 })
 
+// function auth (req: Request, res: Response, next: NextFunction) {
+//   if ('autorizado') {
+//     next()
+//   }
+
+//   res.status(403).json('parou!')
+// }
+
 // private
 app.post('/api/articles', async (req: Request, res: Response) => {
+  const token = req.header('authorization')?.replace('Bearer ', '') ?? ''
+  const payload = await verifyToken(token)
+  const idProp = 'id'
+
+  const data = {
+    ...req.body.article,
+    authorId: payload[idProp],
+  }
+
   return pipe(
-    req.body.article,
+    data,
     registerArticle(createArticleInDB),
     TE.map(result => res.json(result)),
     TE.mapLeft(error => res.status(422).json(getError(error.message))),

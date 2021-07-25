@@ -23,6 +23,7 @@ export const userCodec = t.intersection([
 ])
 
 export type User = t.TypeOf<typeof userCodec>
+export type UserOutput = t.OutputOf<typeof userCodec>
 
 export const createUserCodec = t.type({
   username: slugCodec,

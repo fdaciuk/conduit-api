@@ -3,14 +3,10 @@ import * as article from '@/adapters/use-cases/article/register-article-adapter'
 import * as comment from '@/adapters/use-cases/article/add-comment-to-an-article-adapter'
 import * as jwt from '@/adapters/ports/jwt'
 
-import * as db from '@/ports/db-in-memory/db'
+import * as db from '@/ports/db-in-memory'
 
 export const createUserInDB: user.OutsideRegisterUser = async (data) => {
-  const registeredUser = await db.outsideRegisterUser(data)
-
-  if (!registeredUser) {
-    throw new Error('Internal error registering user')
-  }
+  const registeredUser = await db.createUserInDB(data)
 
   const token = await jwt.generateToken({ id: registeredUser.id })
 
@@ -25,10 +21,19 @@ export const createUserInDB: user.OutsideRegisterUser = async (data) => {
   }
 }
 
-export const createArticleInDB: article.OutsideRegisterArticle = (data) => {
-  return db.outsideRegisterArticle(data)
+export const createArticleInDB: article.OutsideRegisterArticle = async (data) => {
+  const registeredArticle = await db.createArticleInDB(data)
+  const { authorId, ...articleWithoutAuthorID } = registeredArticle.article
+
+  return {
+    article: {
+      ...articleWithoutAuthorID,
+      favorited: false,
+    },
+    author: registeredArticle.author,
+  }
 }
 
 export const addCommentToAnArticleInDB: comment.OutsideCreateComment = (data) => {
-  return db.outsideCreateComment(data)
+  return db.addCommentToAnArticleInDB(data)
 }

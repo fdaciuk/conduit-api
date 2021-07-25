@@ -7,6 +7,7 @@ const data: CreateArticle = {
   title: 'Article title',
   body: 'Article body',
   description: 'Article description',
+  authorId: unsafe('d6562b7f-0543-4d42-b294-1a1619a0ae32'),
 }
 
 const dataWithTagList: CreateArticle = {
@@ -14,6 +15,7 @@ const dataWithTagList: CreateArticle = {
   body: 'Article body 2',
   description: 'Article description 2',
   tagList: [unsafe('tag1'), unsafe('tag2')],
+  authorId: unsafe('d6562b7f-0543-4d42-b294-1a1619a0ae32'),
 }
 
 const dataWithInvalidTagList: CreateArticle = {
@@ -21,12 +23,21 @@ const dataWithInvalidTagList: CreateArticle = {
   body: 'Article body 3',
   description: 'Article description 3',
   tagList: [unsafe('taG1'), unsafe('3ag2')],
+  authorId: unsafe('d6562b7f-0543-4d42-b294-1a1619a0ae32'),
 }
 
 const dataWithInvalidTitle: CreateArticle = {
   title: unsafe(1),
   body: 'Article body',
   description: 'Article description',
+  authorId: unsafe('d6562b7f-0543-4d42-b294-1a1619a0ae32'),
+}
+
+const dataWithInvalidAuthorID: CreateArticle = {
+  title: 'Article title',
+  body: 'Article body',
+  description: 'Article description',
+  authorId: unsafe('123'),
 }
 
 const registerOk: OutsideRegisterArticle<string> = async (data: CreateArticle) => {
@@ -68,6 +79,14 @@ it('Should not accept article register if title is invalid', async () => {
     dataWithInvalidTitle,
     registerArticle(registerOk),
     mapAll(result => expect(result).toEqual(new Error('Invalid title'))),
+  )()
+})
+
+it('Should not accept article register if author ID is invalid', async () => {
+  return pipe(
+    dataWithInvalidAuthorID,
+    registerArticle(registerOk),
+    mapAll(result => expect(result).toEqual(new Error('Invalid author ID'))),
   )()
 })
 
