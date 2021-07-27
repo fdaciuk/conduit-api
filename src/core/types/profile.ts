@@ -9,3 +9,4 @@ export const profileCodec = t.type({
 })
 
 export type Profile = t.TypeOf<typeof profileCodec>
+export type ProfileOutput = t.OutputOf<typeof profileCodec>

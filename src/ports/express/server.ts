@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express'
+import express, { Request as ExpressRequest, Response, NextFunction } from 'express'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import {
@@ -16,7 +16,11 @@ import {
   addCommentToAnArticleInDB,
 } from '@/adapters/ports/db'
 import { env } from '@/helpers'
-import { verifyToken } from '@/adapters/ports/jwt'
+import { verifyToken, JWTPayload } from '@/adapters/ports/jwt'
+
+type Request = ExpressRequest & {
+  auth?: JWTPayload
+}
 
 const app = express()
 
@@ -29,7 +33,6 @@ app
   .disable('x-powered-by')
   .disable('etag')
 
-// public
 app.post('/api/users', async (req: Request, res: Response) => {
   return pipe(
     req.body.user,
@@ -39,18 +42,19 @@ app.post('/api/users', async (req: Request, res: Response) => {
   )()
 })
 
-// function auth (req: Request, res: Response, next: NextFunction) {
-//   if ('autorizado') {
-//     next()
-//   }
+async function auth (req: Request, res: Response, next: NextFunction) {
+  try {
+    const token = req.header('authorization')?.replace('Bearer ', '') ?? ''
+    const payload = await verifyToken(token)
+    req.auth = payload
+    next()
+  } catch {
+    res.status(401).json(getError('Unauthorized'))
+  }
+}
 
-//   res.status(403).json('parou!')
-// }
-
-// private
-app.post('/api/articles', async (req: Request, res: Response) => {
-  const token = req.header('authorization')?.replace('Bearer ', '') ?? ''
-  const payload = await verifyToken(token)
+app.post('/api/articles', auth, async (req: Request, res: Response) => {
+  const payload = req.auth ?? {}
   const idProp = 'id'
 
   const data = {
@@ -66,9 +70,19 @@ app.post('/api/articles', async (req: Request, res: Response) => {
   )()
 })
 
-app.post('/api/articles/:slug/comments', async (req: Request, res: Response) => {
+app.post('/api/articles/:slug/comments', auth, async (req: Request, res: Response) => {
+  const payload = req.auth ?? {}
+  const idProp = 'id'
+  const slugProp = 'slug'
+
+  const data = {
+    ...req.body.comment,
+    authorId: payload[idProp],
+    articleSlug: req.params[slugProp],
+  }
+
   return pipe(
-    req.body.comment,
+    data,
     addCommentToAnArticle(addCommentToAnArticleInDB),
     TE.map(result => res.json(result)),
     TE.mapLeft(error => res.status(422).json(getError(error.message))),
