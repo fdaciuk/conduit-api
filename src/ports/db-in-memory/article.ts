@@ -2,22 +2,23 @@ import { v4 as uuidv4 } from 'uuid'
 import slugify from 'slugify'
 
 import { CreateArticle } from '@/core/types/article'
-import * as comment from '@/adapters/use-cases/article/add-comment-to-an-article-adapter'
+import { CreateComment } from '@/core/types/comment'
+import { ProfileOutput } from '@/core/types/profile'
 import { db } from './db'
 
 export const createArticleInDB = async (data: CreateArticle) => {
   const id = uuidv4()
   const date = new Date().toISOString()
 
-  const author = db.users[data.authorId]
+  const author = getUserProfileFromDB(data.authorId)
 
-  if (!author) {
-    throw new Error('Invalid author ID')
-  }
+  const articleSlug = slugify(data.title, { lower: true })
+
+  db.articlesBySlug[articleSlug] = id
 
   const registeredArticle = db.articles[id] = {
     id,
-    slug: slugify(data.title, { lower: true }),
+    slug: articleSlug,
     title: data.title,
     description: data.description,
     body: data.body,
@@ -30,31 +31,42 @@ export const createArticleInDB = async (data: CreateArticle) => {
 
   return {
     article: registeredArticle,
-    author: {
-      email: author.email,
-      username: author.id,
-      bio: author.bio,
-      image: author.image,
-      following: false,
-    },
+    author,
   }
 }
 
-export const addCommentToAnArticleInDB: comment.OutsideCreateComment = async (data) => {
+export const addCommentToAnArticleInDB = async (data: CreateComment) => {
   const date = new Date().toISOString()
+  const id = Date.now()
+  const articleId = db.articlesBySlug[data.articleSlug] || ''
+
+  const author = getUserProfileFromDB(data.authorId)
+
+  const comment = {
+    id,
+    createdAt: date,
+    updatedAt: date,
+    body: data.body,
+    articleId,
+    authorId: data.authorId,
+  }
+
+  db.comments[articleId] = (db.comments[articleId] ?? []).concat(comment)
+
+  return { comment, author }
+}
+
+function getUserProfileFromDB (userId: string): ProfileOutput {
+  const user = db.users[userId]
+
+  if (!user) {
+    throw new Error('User does not exist')
+  }
 
   return {
-    comment: {
-      id: Date.now(),
-      createdAt: date,
-      updatedAt: date,
-      body: data.body,
-      // author: {
-      //   "username": "jake",
-      //   "bio": "I work at statefarm",
-      //   "image": "https://i.stack.imgur.com/xHWG8.jpg",
-      //   "following": false
-      // }
-    },
+    username: user.username,
+    bio: user.bio ?? '',
+    image: user.image ?? '',
+    following: false,
   }
 }

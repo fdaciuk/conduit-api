@@ -1,6 +1,6 @@
 import * as jwt from '@/ports/jwt/jose'
 
-type JWTPayload = { id: string }
+export type JWTPayload = { [id: string]: unknown }
 
 type ExpirationTime = string
 
