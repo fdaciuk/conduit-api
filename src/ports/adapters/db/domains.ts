@@ -1,8 +1,8 @@
-import * as user from '@/adapters/use-cases/user/register-user-adapter'
-import * as article from '@/adapters/use-cases/article/register-article-adapter'
-import * as comment from '@/adapters/use-cases/article/add-comment-to-an-article-adapter'
+import * as user from '@/core/user/use-cases/register-user-adapter'
+import * as article from '@/core/article/use-cases/register-article-adapter'
+import * as comment from '@/core/article/use-cases/add-comment-to-an-article-adapter'
 
-import * as jwt from '@/adapters/ports/jwt'
+import * as jwt from '@/ports/adapters/jwt'
 
 import { database as db } from './db'
 

@@ -1,6 +1,6 @@
 import { pipe } from 'fp-ts/function'
 import { registerUser, OutsideRegisterUser } from './register-user'
-import { CreateUser } from '@/core/types/user'
+import { CreateUser } from '@/core/user/types'
 import { mapAll, unsafe } from '@/config/tests/fixtures'
 
 const registerOk: OutsideRegisterUser<string> = async (data) => {

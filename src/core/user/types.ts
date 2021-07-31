@@ -4,7 +4,7 @@ import {
   passwordCodec,
   slugCodec,
   urlCodec,
-} from '@/core/types/scalar'
+} from '@/core/types'
 
 const userCodecRequired = t.type({
   email: emailCodec,

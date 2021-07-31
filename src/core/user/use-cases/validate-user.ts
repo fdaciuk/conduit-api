@@ -1,7 +1,7 @@
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
 import { failure } from 'io-ts/PathReporter'
-import { createUserCodec, CreateUser } from '@/core/types/user'
+import { createUserCodec, CreateUser } from '@/core/user/types'
 
 type ValidateUser = (data: CreateUser) => E.Either<Error, unknown>
 

@@ -1,4 +1,4 @@
-import { CreateUser } from '@/core/types/user'
+import { CreateUser } from '@/core/user/types'
 import { v4 as uuidv4 } from 'uuid'
 import { DBUser, db } from './db'
 

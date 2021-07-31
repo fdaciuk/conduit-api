@@ -2,7 +2,7 @@ import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
 import { failure } from 'io-ts/PathReporter'
-import { CreateComment, createCommentCodec } from '@/core/types/comment'
+import { CreateComment, createCommentCodec } from '@/core/comment/types'
 
 export type OutsideCreateComment<A> = (data: CreateComment) => Promise<A>
 
