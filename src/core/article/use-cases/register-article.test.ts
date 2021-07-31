@@ -1,5 +1,5 @@
 import { pipe } from 'fp-ts/function'
-import { CreateArticle } from '@/core/types/article'
+import { CreateArticle } from '@/core/article/types'
 import { registerArticle, OutsideRegisterArticle } from './register-article'
 import { mapAll, unsafe } from '@/config/tests/fixtures'
 

@@ -1,5 +1,5 @@
-import * as user from '@/core/use-cases/user/register-user'
-import { UserOutput } from '@/core/types/user'
+import * as user from './register-user'
+import { UserOutput } from '@/core/user/types'
 
 export type OutsideRegisterUser = user.OutsideRegisterUser<{
   user: UserOutput

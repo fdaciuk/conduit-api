@@ -1,6 +1,6 @@
-import { UserOutput } from '@/core/types/user'
-import { ArticleOutput } from '@/core/types/article'
-import { CommentOutput } from '@/core/types/comment'
+import { UserOutput } from '@/core/user/types'
+import { ArticleOutput } from '@/core/article/types'
+import { CommentOutput } from '@/core/comment/types'
 
 export type DBUser = Omit<UserOutput, 'token'> & {
   id: string

@@ -1,7 +1,7 @@
 import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
-import { CreateUser } from '@/core/types/user'
+import { CreateUser } from '@/core/user/types'
 import { validateUser } from './validate-user'
 
 export type OutsideRegisterUser<A> = (data: CreateUser) => Promise<A>

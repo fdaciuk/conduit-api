@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid'
 import slugify from 'slugify'
 
-import { CreateArticle } from '@/core/types/article'
-import { CreateComment } from '@/core/types/comment'
-import { ProfileOutput } from '@/core/types/profile'
+import { CreateArticle } from '@/core/article/types'
+import { CreateComment } from '@/core/comment/types'
+import { ProfileOutput } from '@/core/profile/types'
 import { db } from './db'
 
 export const createArticleInDB = async (data: CreateArticle) => {
