@@ -2,6 +2,8 @@ import * as user from '@/core/user/use-cases/register-user-adapter'
 import * as article from '@/core/article/use-cases/register-article-adapter'
 import * as comment from '@/core/article/use-cases/add-comment-to-an-article-adapter'
 
+import { LoginUser, UserOutput } from '@/core/user/types'
+
 import * as jwt from '@/ports/adapters/jwt'
 
 import { database as db } from './db'
@@ -17,6 +19,23 @@ export const createUserInDB: user.OutsideRegisterUser = async (data) => {
       email: registeredUser.email,
       bio: '',
       image: undefined,
+      token,
+    },
+  }
+}
+
+type Login = (data: LoginUser) => Promise<{ user: UserOutput }>
+export const login: Login = async (data) => {
+  const userData = await db.login(data)
+
+  const token = await jwt.generateToken({ id: userData.id })
+
+  return {
+    user: {
+      email: userData.email,
+      username: userData.username,
+      bio: userData.bio,
+      image: userData.image,
       token,
     },
   }
