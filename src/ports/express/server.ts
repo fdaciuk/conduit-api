@@ -6,6 +6,7 @@ import express, {
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
+import cors from 'cors'
 import {
   registerUser,
 } from '@/core/user/use-cases/register-user-adapter'
@@ -38,6 +39,8 @@ app.use(express.urlencoded({ extended: true }))
 app
   .disable('x-powered-by')
   .disable('etag')
+
+app.use(cors())
 
 app.post('/api/users', async (req: Request, res: Response) => {
   return pipe(
