@@ -1,6 +1,10 @@
+import * as TE from 'fp-ts/TaskEither'
+import * as E from 'fp-ts/Either'
+import * as O from 'fp-ts/Option'
+import { pipe } from 'fp-ts/function'
 import argon2 from 'argon2'
-import { CreateUser, LoginUser } from '@/core/user/types'
 import { v4 as uuidv4 } from 'uuid'
+import { CreateUser, LoginUser } from '@/core/user/types'
 import { DBUser, db } from './db'
 
 type CreateUserInDB = (data: CreateUser) => Promise<DBUser>
@@ -26,14 +30,24 @@ export const createUserInDB: CreateUserInDB = async (data) => {
   return user
 }
 
-type Login = (data: LoginUser) => Promise<DBUser>
-export const login: Login = async (data) => {
-  const userId = db.usersByEmail[data.email]
-  const user = db.users[userId ?? '']
+type Login = (data: LoginUser) => TE.TaskEither<Error, DBUser>
+export const login: Login = (data) => {
+  return pipe(
+    O.fromNullable(db.usersByEmail[data.email]),
+    O.chain(userId => O.fromNullable(db.users[userId])),
+    E.fromOption(() => new Error('User not found')),
+    TE.fromEither,
+    TE.chain(user =>
+      TE.tryCatch(
+        async () => {
+          if (!(await argon2.verify(user.password, data.password))) {
+            throw new Error('Invalid email or password')
+          }
 
-  if (!user || !(await argon2.verify(user.password, data.password))) {
-    throw new Error('Invalid email or password')
-  }
-
-  return user
+          return user
+        },
+        E.toError,
+      ),
+    ),
+  )
 }

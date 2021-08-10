@@ -5,7 +5,6 @@ import express, {
 } from 'express'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
-import * as E from 'fp-ts/Either'
 import cors from 'cors'
 import {
   registerUser,
@@ -53,10 +52,8 @@ app.post('/api/users', async (req: Request, res: Response) => {
 
 app.post('/api/users/login', async (req: Request, res: Response) => {
   return pipe(
-    TE.tryCatch(
-      () => login(req.body.user),
-      E.toError,
-    ),
+    req.body.user,
+    login,
     TE.map(result => res.json(result)),
     TE.mapLeft(error => res.status(422).json(getError(error.message))),
   )()

@@ -1,8 +1,12 @@
+import * as TE from 'fp-ts/TaskEither'
+import * as E from 'fp-ts/Either'
+import { pipe } from 'fp-ts/function'
+import { failure } from 'io-ts/PathReporter'
 import * as user from '@/core/user/use-cases/register-user-adapter'
 import * as article from '@/core/article/use-cases/register-article-adapter'
 import * as comment from '@/core/article/use-cases/add-comment-to-an-article-adapter'
 
-import { LoginUser, UserOutput } from '@/core/user/types'
+import { UserOutput, loginUserCodec } from '@/core/user/types'
 
 import * as jwt from '@/ports/adapters/jwt'
 
@@ -18,27 +22,37 @@ export const createUserInDB: user.OutsideRegisterUser = async (data) => {
       username: registeredUser.username,
       email: registeredUser.email,
       bio: '',
-      image: undefined,
       token,
     },
   }
 }
 
-type Login = (data: LoginUser) => Promise<{ user: UserOutput }>
-export const login: Login = async (data) => {
-  const userData = await db.login(data)
+type Login = (data: unknown) => TE.TaskEither<Error, { user: UserOutput }>
+export const login: Login = (data) => {
+  return pipe(
+    loginUserCodec.decode(data ?? {}),
+    E.mapLeft(errors => new Error(failure(errors).join(':::'))),
+    TE.fromEither,
+    TE.chain(db.login),
+    TE.chain(userData =>
+      TE.tryCatch(
+        async () => {
+          const token = await jwt.generateToken({ id: userData.id })
 
-  const token = await jwt.generateToken({ id: userData.id })
-
-  return {
-    user: {
-      email: userData.email,
-      username: userData.username,
-      bio: userData.bio,
-      image: userData.image,
-      token,
-    },
-  }
+          return {
+            user: {
+              email: userData.email,
+              username: userData.username,
+              bio: userData.bio,
+              image: userData.image,
+              token,
+            },
+          }
+        },
+        E.toError,
+      ),
+    ),
+  )
 }
 
 export const createArticleInDB: article.OutsideRegisterArticle = async (data) => {
