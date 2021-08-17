@@ -35,11 +35,14 @@ export const articlesCodec = t.type({
 
 export type Articles = t.TypeOf<typeof articlesCodec>
 
+const authorIdCodec = withMessage(UUID, () => 'Invalid author ID')
+export type AuthorId = t.TypeOf<typeof authorIdCodec>
+
 const createArticleCodecRequired = t.type({
   title: withMessage(t.string, () => 'Invalid title'),
   description: withMessage(t.string, () => 'Invalid description'),
   body: withMessage(t.string, () => 'Invalid body'),
-  authorId: withMessage(UUID, () => 'Invalid author ID'),
+  authorId: authorIdCodec,
 })
 
 const createArticleCodecOptional = t.partial({
