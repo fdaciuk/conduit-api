@@ -4,6 +4,7 @@ import * as E from 'fp-ts/Either'
 import { CreateUser, LoginUser } from '@/core/user/types'
 import * as user from '@/core/user/use-cases/register-user-adapter'
 import * as db from '@/ports/adapters/db'
+import { getError } from '@/ports/adapters/http/http'
 
 export function registerUser (data: CreateUser) {
   return pipe(
@@ -21,12 +22,4 @@ export function login (data: LoginUser) {
     ),
     TE.mapLeft(error => getError(error.message)),
   )
-}
-
-function getError (errors: string) {
-  return {
-    errors: {
-      body: errors.split(':::'),
-    },
-  }
 }
