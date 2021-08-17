@@ -7,16 +7,8 @@ import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import cors from 'cors'
 import * as user from '@/ports/adapters/http/modules/user'
-import {
-  registerArticle,
-} from '@/core/article/use-cases/register-article-adapter'
-import {
-  addCommentToAnArticle,
-} from '@/core/article/use-cases/add-comment-to-an-article-adapter'
-import {
-  createArticleInDB,
-  addCommentToAnArticleInDB,
-} from '@/ports/adapters/db'
+import * as article from '@/ports/adapters/http/modules/article'
+
 import { env } from '@/helpers'
 import { verifyToken, JWTPayload } from '@/ports/adapters/jwt'
 
@@ -77,9 +69,9 @@ app.post('/api/articles', auth, async (req: Request, res: Response) => {
 
   return pipe(
     data,
-    registerArticle(createArticleInDB),
+    article.registerArticle,
     TE.map(result => res.json(result)),
-    TE.mapLeft(error => res.status(422).json(getError(error.message))),
+    TE.mapLeft(error => res.status(422).json(error)),
   )()
 })
 
@@ -96,9 +88,9 @@ app.post('/api/articles/:slug/comments', auth, async (req: Request, res: Respons
 
   return pipe(
     data,
-    addCommentToAnArticle(addCommentToAnArticleInDB),
+    article.addCommentToAnArticle,
     TE.map(result => res.json(result)),
-    TE.mapLeft(error => res.status(422).json(getError(error.message))),
+    TE.mapLeft(error => res.status(422).json(error)),
   )()
 })
 
