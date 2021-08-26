@@ -62,7 +62,7 @@ const auth = async <T>(
   done: HookHandlerDoneFunction,
 ) => {
   try {
-    const token = req.headers.authorization?.replace('Bearer ', '') ?? ''
+    const token = req.headers.authorization?.replace('Token ', '') ?? ''
     const payload = await verifyToken(token)
     req.raw.auth = payload
     done()

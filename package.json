@@ -13,6 +13,7 @@
     "test:watch": "jest --watch",
     "test:integration": "jest --passWithNoTests --config jest.config.integration.js",
     "test:integration:watch": " yarn test:integration --watch",
+    "test:api": "APIURL=http://localhost:3333/api ./src/config/tests/postman/run-api-tests.sh",
     "lint": "eslint . --ext js,ts",
     "lint:fix": "eslint --fix . --ext js,ts",
     "type-check": "tsc --project tsconfig.json --pretty --noEmit",

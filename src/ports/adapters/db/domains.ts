@@ -18,7 +18,7 @@ export const createUserInDB: user.OutsideRegisterUser = async (data) => {
       username: registeredUser.username,
       email: registeredUser.email,
       bio: '',
-      image: undefined,
+      image: '',
       token,
     },
   }
@@ -34,8 +34,8 @@ export const login: Login = async (data) => {
     user: {
       email: userData.email,
       username: userData.username,
-      bio: userData.bio,
-      image: userData.image,
+      bio: userData.bio ?? '',
+      image: userData.image ?? '',
       token,
     },
   }
@@ -49,8 +49,8 @@ export const createArticleInDB: article.OutsideRegisterArticle = async (data) =>
     article: {
       ...articleWithoutAuthorID,
       favorited: false,
+      author: registeredArticle.author,
     },
-    author: registeredArticle.author,
   }
 }
 
