@@ -12,10 +12,10 @@ import { Slug } from '@/core/types/slug'
 import { CreateUser, LoginUser } from '@/core/user/types'
 import { CreateArticle, AuthorId } from '@/core/article/types'
 import { CreateComment } from '@/core/comment/types'
-import { getError } from '@/ports/adapters/http/http'
+import { getError, getToken } from '@/ports/adapters/http/http'
 import * as user from '@/ports/adapters/http/modules/user'
 import * as article from '@/ports/adapters/http/modules/article'
-import { verifyToken, JWTPayload } from '@/ports/adapters/jwt'
+import { JWTPayload } from '@/ports/adapters/jwt'
 import http from 'http'
 
 type CustomRequest = http.IncomingMessage & {
@@ -62,8 +62,7 @@ const auth = async <T>(
   done: HookHandlerDoneFunction,
 ) => {
   try {
-    const token = req.headers.authorization?.replace('Token ', '') ?? ''
-    const payload = await verifyToken(token)
+    const payload = await getToken(req.headers.authorization)
     req.raw.auth = payload
     done()
   } catch {
