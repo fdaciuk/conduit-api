@@ -8,9 +8,9 @@ import * as TE from 'fp-ts/TaskEither'
 import cors from 'cors'
 import * as user from '@/ports/adapters/http/modules/user'
 import * as article from '@/ports/adapters/http/modules/article'
-
+import { getError, getToken } from '@/ports/adapters/http/http'
 import { env } from '@/helpers'
-import { verifyToken, JWTPayload } from '@/ports/adapters/jwt'
+import { JWTPayload } from '@/ports/adapters/jwt'
 
 type Request = ExpressRequest & {
   auth?: JWTPayload
@@ -49,8 +49,7 @@ app.post('/api/users/login', async (req: Request, res: Response) => {
 
 async function auth (req: Request, res: Response, next: NextFunction) {
   try {
-    const token = req.header('authorization')?.replace('Token ', '') ?? ''
-    const payload = await verifyToken(token)
+    const payload = await getToken(req.header('authorization'))
     req.auth = payload
     next()
   } catch {
@@ -98,12 +97,4 @@ export function start () {
   app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`)
   })
-}
-
-function getError (errors: string) {
-  return {
-    errors: {
-      body: errors.split(':::'),
-    },
-  }
 }
