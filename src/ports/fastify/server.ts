@@ -7,6 +7,7 @@ import fastify, {
 } from 'fastify'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
+import * as E from 'fp-ts/Either'
 import { env } from '@/helpers/env'
 import { Slug } from '@/core/types/slug'
 import { CreateUser, LoginUser } from '@/core/user/types'
@@ -19,7 +20,7 @@ import { JWTPayload } from '@/ports/adapters/jwt'
 import http from 'http'
 
 type CustomRequest = http.IncomingMessage & {
-  auth?: JWTPayload
+  auth: JWTPayload
 }
 
 const app = fastify<http.Server, CustomRequest>({ logger: true })
@@ -32,8 +33,8 @@ type ApiUsers = {
   }
 }
 
-app.post<ApiUsers>('/api/users', async (req, reply) => {
-  return pipe(
+app.post<ApiUsers>('/api/users', (req, reply) => {
+  pipe(
     req.body.user,
     user.registerUser,
     TE.map(result => reply.send(result)),
@@ -47,8 +48,8 @@ type UsersLogin = {
   }
 }
 
-app.post<UsersLogin>('/api/users/login', async (req, reply) => {
-  return pipe(
+app.post<UsersLogin>('/api/users/login', (req, reply) => {
+  pipe(
     req.body.user,
     user.login,
     TE.map(result => reply.send(result)),
@@ -56,19 +57,45 @@ app.post<UsersLogin>('/api/users/login', async (req, reply) => {
   )()
 })
 
-const auth = async <T>(
+const auth = <T>(
   req: FastifyRequest<T, http.Server, CustomRequest>,
   reply: FastifyReply,
   done: HookHandlerDoneFunction,
 ) => {
-  try {
-    const payload = await getToken(req.headers.authorization)
-    req.raw.auth = payload
-    done()
-  } catch {
-    reply.code(401).send(getError('Unauthorized'))
-  }
+  pipe(
+    TE.tryCatch(
+      () => getToken(req.headers.authorization),
+      E.toError,
+    ),
+    TE.map((payload) => {
+      req.raw.auth = payload
+      return done()
+    }),
+    TE.mapLeft(() => reply.code(401).send(getError('Unauthorized'))),
+  )()
 }
+
+// TODO: Tentar abstrair esses tipos do Fastify, tá muito feio
+type FastifyApiGetCurrentUser = RouteShorthandOptions<
+  http.Server,
+  CustomRequest,
+  RawReplyDefaultExpression<http.Server>
+>
+
+const getCurrentUserOptions: FastifyApiGetCurrentUser = {
+  preValidation: (...args) => auth(...args),
+}
+
+app.get('/api/user', getCurrentUserOptions, (req, reply) => {
+  pipe(
+    user.getCurrentUser({
+      payload: req.raw.auth,
+      authHeader: req.headers.authorization,
+    }),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(error => reply.code(422).send(error)),
+  )()
+})
 
 type ApiArticles = {
   Body: {
@@ -87,16 +114,17 @@ const articleApiOptions: FastifyApiArticleOptions = {
   preValidation: (...args) => auth<ApiArticles>(...args),
 }
 
-app.post<ApiArticles>('/api/articles', articleApiOptions, async (req, reply) => {
+app.post<ApiArticles>('/api/articles', articleApiOptions, (req, reply) => {
   const payload = req.raw.auth
   const idProp = 'id'
 
   const data = {
     ...req.body.article,
+    // TODO: Try to remove type assertion
     authorId: payload?.[idProp] as AuthorId,
   }
 
-  return pipe(
+  pipe(
     data,
     article.registerArticle,
     TE.map(result => reply.send(result)),
@@ -125,7 +153,7 @@ const addCommentOptions: FastifyApiAddCommentOptions = {
   preValidation: (...args) => auth<ApiAddComment>(...args),
 }
 
-app.post<ApiAddComment>('/api/articles/:slug/comments', addCommentOptions, async (req, reply) => {
+app.post<ApiAddComment>('/api/articles/:slug/comments', addCommentOptions, (req, reply) => {
   const payload = req.raw.auth
   const idProp = 'id'
 
@@ -135,7 +163,7 @@ app.post<ApiAddComment>('/api/articles/:slug/comments', addCommentOptions, async
     articleSlug: req.params.slug,
   }
 
-  return pipe(
+  pipe(
     data,
     article.addCommentToAnArticle,
     TE.map(result => reply.send(result)),

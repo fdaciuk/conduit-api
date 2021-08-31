@@ -1,6 +1,7 @@
 import * as user from '@/core/user/use-cases/register-user-adapter'
 import * as article from '@/core/article/use-cases/register-article-adapter'
 import * as comment from '@/core/article/use-cases/add-comment-to-an-article-adapter'
+import { AuthorId } from '@/core/article/types'
 
 import { LoginUser, UserOutput } from '@/core/user/types'
 
@@ -39,6 +40,16 @@ export const login: Login = async (data) => {
       token,
     },
   }
+}
+
+export const getCurrentUser = async (userId: AuthorId) => {
+  const user = await db.getCurrentUser(userId)
+
+  if (!user) {
+    throw new Error('User does not exist')
+  }
+
+  return user
 }
 
 export const createArticleInDB: article.OutsideRegisterArticle = async (data) => {

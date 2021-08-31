@@ -10,7 +10,11 @@ export function getError (errors: string) {
   }
 }
 
-export function getToken (authorizationHeader: string = '') {
-  const token = authorizationHeader.replace('Token ', '')
+export function getToken (authHeader: string = '') {
+  const token = extractToken(authHeader)
   return verifyToken(token)
+}
+
+export function extractToken (authHeader: string = '') {
+  return authHeader.replace('Token ', '')
 }
