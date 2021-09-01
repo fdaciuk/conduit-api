@@ -20,7 +20,7 @@ export type DBComment = Omit<CommentOutput, 'author'> & {
 type ArticleID = string
 type UserID = string
 
-type DB = {
+type DBInMemory = {
   users: { [id: string]: DBUser }
   usersByEmail: { [email: string]: UserID }
   articles: { [id: string]: DBArticle }
@@ -28,7 +28,7 @@ type DB = {
   comments: { [articleId: string]: DBComment[] }
 }
 
-export const db: DB = {
+export const dbInMemory: DBInMemory = {
   users: {},
   usersByEmail: {},
   articles: {},
