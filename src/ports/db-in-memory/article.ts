@@ -4,7 +4,7 @@ import slugify from 'slugify'
 import { CreateArticle } from '@/core/article/types'
 import { CreateComment } from '@/core/comment/types'
 import { ProfileOutput } from '@/core/profile/types'
-import { db } from './db'
+import { dbInMemory as db } from './db'
 
 export const createArticleInDB = async (data: CreateArticle) => {
   const id = uuidv4()
