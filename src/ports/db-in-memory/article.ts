@@ -30,7 +30,7 @@ export const createArticleInDB = async (data: CreateArticle) => {
   }
 
   return {
-    article: registeredArticle,
+    ...registeredArticle,
     author,
   }
 }
@@ -53,7 +53,7 @@ export const addCommentToAnArticleInDB = async (data: CreateComment) => {
 
   db.comments[articleId] = (db.comments[articleId] ?? []).concat(comment)
 
-  return { comment, author }
+  return { ...comment, author }
 }
 
 function getUserProfileFromDB (userId: string): ProfileOutput {
