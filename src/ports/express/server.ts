@@ -57,6 +57,19 @@ async function auth (req: Request, res: Response, next: NextFunction) {
   }
 }
 
+app.get('/api/user', auth, (req: Request, res: Response) => {
+  const payload = req.auth ?? {}
+
+  return pipe(
+    user.getCurrentUser({
+      payload,
+      authHeader: req.header('authorization'),
+    }),
+    TE.map(result => res.json(result)),
+    TE.mapLeft(error => res.status(422).json(error)),
+  )()
+})
+
 app.post('/api/articles', auth, async (req: Request, res: Response) => {
   const payload = req.auth ?? {}
   const idProp = 'id'
