@@ -2,7 +2,6 @@ import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
 import { CreateUser, LoginUser, UserOutput } from '@/core/user/types'
-import { AuthorId } from '@/core/article/types'
 import * as user from '@/core/user/use-cases/register-user-adapter'
 import * as db from '@/ports/adapters/db'
 import { getError, extractToken } from '@/ports/adapters/http/http'
@@ -43,14 +42,12 @@ export function login (data: LoginUser) {
 }
 
 type GetCurrentUserInput = {
-  payload: jwt.JWTPayload
+  payload: jwt.JWTPayloadInput
   authHeader?: string
 }
 
 export function getCurrentUser ({ payload, authHeader }: GetCurrentUserInput) {
-  const propId = 'id'
-  // TODO: Tentar remover o type assertion
-  const userId = payload[propId] as AuthorId
+  const userId = payload.id
   const token = extractToken(authHeader)
 
   return pipe(

@@ -1,10 +1,9 @@
-import { AuthorId } from '@/core/article/types'
 import { database as db } from './db'
 
 export const createUserInDB = db.createUserInDB
 export const login = db.login
 
-export const getCurrentUser = async (userId: AuthorId) => {
+export const getCurrentUser = async (userId: string) => {
   const user = await db.getCurrentUser(userId)
 
   if (!user) {
