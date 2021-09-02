@@ -11,7 +11,7 @@ import * as E from 'fp-ts/Either'
 import { env } from '@/helpers/env'
 import { Slug } from '@/core/types/slug'
 import { CreateUser, LoginUser } from '@/core/user/types'
-import { CreateArticle, AuthorId } from '@/core/article/types'
+import { CreateArticle } from '@/core/article/types'
 import { CreateComment } from '@/core/comment/types'
 import { getError, getToken } from '@/ports/adapters/http/http'
 import * as user from '@/ports/adapters/http/modules/user'
@@ -115,13 +115,9 @@ const articleApiOptions: FastifyApiArticleOptions = {
 }
 
 app.post<ApiArticles>('/api/articles', articleApiOptions, (req, reply) => {
-  const payload = req.raw.auth
-  const idProp = 'id'
-
   const data = {
     ...req.body.article,
-    // TODO: Try to remove type assertion
-    authorId: payload?.[idProp] as AuthorId,
+    authorId: req.raw.auth.id,
   }
 
   pipe(
@@ -154,12 +150,9 @@ const addCommentOptions: FastifyApiAddCommentOptions = {
 }
 
 app.post<ApiAddComment>('/api/articles/:slug/comments', addCommentOptions, (req, reply) => {
-  const payload = req.raw.auth
-  const idProp = 'id'
-
   const data = {
     ...req.body.comment,
-    authorId: payload?.[idProp] as AuthorId,
+    authorId: req.raw.auth.id,
     articleSlug: req.params.slug,
   }
 

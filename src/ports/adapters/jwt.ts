@@ -1,14 +1,32 @@
 import * as jwt from '@/ports/jwt/jose'
+import { AuthorId } from '@/core/article/types'
 
-export type JWTPayload = { [id: string]: unknown }
+export type JWTPayload = {
+  id: AuthorId
+}
+
+export type JWTPayloadInput = {
+  id: string
+}
 
 type ExpirationTime = string
 
-export const generateToken = (...args: [JWTPayload, ExpirationTime?]) => {
+export const generateToken = (...args: [JWTPayloadInput, ExpirationTime?]) => {
   return jwt.createJWT(...args)
 }
 
 export const verifyToken = async (token: string) => {
   const { payload } = await jwt.verifyJWT(token)
-  return payload
+
+  if (isValidPayload(payload)) {
+    return payload
+  }
+
+  throw new Error('Invalid payload. User ID is missing')
+}
+
+type Obj = {}
+
+function isValidPayload (payload: Obj): payload is JWTPayload {
+  return 'id' in payload
 }
