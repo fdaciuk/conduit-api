@@ -5,6 +5,7 @@ import express, {
 } from 'express'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
+import * as E from 'fp-ts/Either'
 import cors from 'cors'
 import * as user from '@/ports/adapters/http/modules/user'
 import * as article from '@/ports/adapters/http/modules/article'
@@ -48,13 +49,17 @@ app.post('/api/users/login', async (req: Request, res: Response) => {
 })
 
 async function auth (req: Request, res: Response, next: NextFunction) {
-  try {
-    const payload = await getToken(req.header('authorization'))
-    req.auth = payload
-    next()
-  } catch {
-    res.status(401).json(getError('Unauthorized'))
-  }
+  pipe(
+    TE.tryCatch(
+      () => getToken(req.header('authorization')),
+      E.toError,
+    ),
+    TE.map((payload) => {
+      req.auth = payload
+      return next()
+    }),
+    TE.mapLeft(() => res.status(401).json(getError('Unauthorized'))),
+  )()
 }
 
 app.get('/api/user', auth, (req: Request, res: Response) => {
