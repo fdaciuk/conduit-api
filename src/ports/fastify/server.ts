@@ -3,6 +3,7 @@ import fastify, {
   FastifyReply,
   HookHandlerDoneFunction,
 } from 'fastify'
+import fastifyCors from 'fastify-cors'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
@@ -30,6 +31,8 @@ type ApiUsers = {
     user: CreateUser
   }
 }
+
+app.register(fastifyCors, { origin: true })
 
 app.post<ApiUsers>('/api/users', (req, reply) => {
   pipe(
