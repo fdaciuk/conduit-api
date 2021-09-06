@@ -5,11 +5,10 @@ import express, {
 } from 'express'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
-import * as E from 'fp-ts/Either'
 import cors from 'cors'
 import * as user from '@/ports/adapters/http/modules/user'
 import * as article from '@/ports/adapters/http/modules/article'
-import { getError, getToken } from '@/ports/adapters/http/http'
+import { authMiddleware } from '@/ports/adapters/http/http'
 import { env } from '@/helpers'
 import { JWTPayload } from '@/ports/adapters/jwt'
 
@@ -50,15 +49,12 @@ app.post('/api/users/login', async (req: Request, res: Response) => {
 
 async function auth (req: Request, res: Response, next: NextFunction) {
   pipe(
-    TE.tryCatch(
-      () => getToken(req.header('authorization')),
-      E.toError,
-    ),
+    authMiddleware(req.header('authorization')),
     TE.map((payload) => {
       req.auth = payload
       return next()
     }),
-    TE.mapLeft(() => res.status(401).json(getError('Unauthorized'))),
+    TE.mapLeft((error) => res.status(401).json(error)),
   )()
 }
 
