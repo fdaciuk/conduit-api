@@ -1,13 +1,14 @@
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
 import { failure } from 'io-ts/PathReporter'
-import { createUserCodec, CreateUser } from '@/core/user/types'
+import { Type } from 'io-ts'
 
-type ValidateUser = (data: CreateUser) => E.Either<Error, unknown>
+type ValidateUser = <A, O>(codec: Type<A, O>) =>
+  (data: O) => E.Either<Error, unknown>
 
-export const validateUser: ValidateUser = (data) => {
+export const validateUser: ValidateUser = (codec) => (data) => {
   return pipe(
-    createUserCodec.decode(data),
+    codec.decode(data),
     E.mapLeft(errors => new Error(failure(errors).join(':::'))),
   )
 }
