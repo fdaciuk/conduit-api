@@ -1,16 +1,26 @@
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
-import { CreateUser, LoginUser, UserOutput } from '@/core/user/types'
-import * as user from '@/core/user/use-cases/register-user-adapter'
+import { CreateUser, UpdateUser, LoginUser, UserOutput } from '@/core/user/types'
+import {
+  registerUser as registerUserAdapter,
+} from '@/core/user/use-cases/register-user-adapter'
+import {
+  updateUser as updateUserAdapter,
+} from '@/core/user/use-cases/update-user-adapter'
 import * as db from '@/ports/adapters/db'
 import { getError, extractToken } from '@/ports/adapters/http/http'
 import * as jwt from '@/ports/adapters/jwt'
 
+type UserIdAndAuthHeader = {
+  id: string
+  authHeader?: string
+}
+
 export function registerUser (data: CreateUser) {
   return pipe(
     data,
-    user.registerUser(db.createUserInDB),
+    registerUserAdapter(db.createUserInDB),
     TE.chain(user => pipe(
       TE.tryCatch(
         () => jwt.generateToken({ id: user.id }),
@@ -19,6 +29,17 @@ export function registerUser (data: CreateUser) {
       TE.map(token => ({ user, token })),
     )),
     TE.map(getUserResponse),
+    TE.mapLeft(error => getError(error.message)),
+  )
+}
+
+export const updateUser = ({ id, authHeader }: UserIdAndAuthHeader) => (data: UpdateUser) => {
+  const token = extractToken(authHeader)
+
+  return pipe(
+    data,
+    updateUserAdapter(db.updateUserInDB(id)),
+    TE.map(user => getUserResponse({ user, token })),
     TE.mapLeft(error => getError(error.message)),
   )
 }
@@ -41,18 +62,12 @@ export function login (data: LoginUser) {
   )
 }
 
-type GetCurrentUserInput = {
-  payload: jwt.JWTPayloadInput
-  authHeader?: string
-}
-
-export function getCurrentUser ({ payload, authHeader }: GetCurrentUserInput) {
-  const userId = payload.id
+export function getCurrentUser ({ id, authHeader }: UserIdAndAuthHeader) {
   const token = extractToken(authHeader)
 
   return pipe(
     TE.tryCatch(
-      () => db.getCurrentUser(userId),
+      () => db.getCurrentUser(id),
       E.toError,
     ),
     TE.map(user => getUserResponse({ user, token })),

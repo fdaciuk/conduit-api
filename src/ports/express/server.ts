@@ -63,7 +63,21 @@ app.get('/api/user', auth, (req: Request, res: Response) => {
 
   return pipe(
     user.getCurrentUser({
-      payload,
+      id: payload.id,
+      authHeader: req.header('authorization'),
+    }),
+    TE.map(result => res.json(result)),
+    TE.mapLeft(error => res.status(422).json(error)),
+  )()
+})
+
+app.put('/api/user', auth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+
+  pipe(
+    req.body.user,
+    user.updateUser({
+      id: payload.id,
       authHeader: req.header('authorization'),
     }),
     TE.map(result => res.json(result)),

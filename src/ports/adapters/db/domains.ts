@@ -1,6 +1,7 @@
 import { database as db } from './db'
 
 export const createUserInDB = db.createUserInDB
+export const updateUserInDB = db.updateUserInDB
 export const login = db.login
 
 export const getCurrentUser = async (userId: string) => {
