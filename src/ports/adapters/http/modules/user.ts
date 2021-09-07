@@ -2,12 +2,7 @@ import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
 import { CreateUser, UpdateUser, LoginUser, UserOutput } from '@/core/user/types'
-import {
-  registerUser as registerUserAdapter,
-} from '@/core/user/use-cases/register-user-adapter'
-import {
-  updateUser as updateUserAdapter,
-} from '@/core/user/use-cases/update-user-adapter'
+import * as user from '@/core/user/use-cases'
 import * as db from '@/ports/adapters/db'
 import { getError, extractToken } from '@/ports/adapters/http/http'
 import * as jwt from '@/ports/adapters/jwt'
@@ -20,7 +15,7 @@ type UserIdAndAuthHeader = {
 export function registerUser (data: CreateUser) {
   return pipe(
     data,
-    registerUserAdapter(db.createUserInDB),
+    user.registerUser(db.createUserInDB),
     TE.chain(user => pipe(
       TE.tryCatch(
         () => jwt.generateToken({ id: user.id }),
@@ -38,7 +33,7 @@ export const updateUser = ({ id, authHeader }: UserIdAndAuthHeader) => (data: Up
 
   return pipe(
     data,
-    updateUserAdapter(db.updateUserInDB(id)),
+    user.updateUser(db.updateUserInDB(id)),
     TE.map(user => getUserResponse({ user, token })),
     TE.mapLeft(error => getError(error.message)),
   )
