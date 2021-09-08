@@ -1,13 +1,14 @@
 import argon2 from 'argon2'
-import { CreateUser, UpdateUser, LoginUser } from '@/core/user/types'
 import { v4 as uuidv4 } from 'uuid'
+import { CreateUser, UpdateUser, LoginUser } from '@/core/user/types'
+import { ValidationError, NotFoundError } from '@/helpers/errors'
 import { DBUser, dbInMemory as db } from './db'
 
 type CreateUserInDB = (data: CreateUser) => Promise<DBUser>
 
 export const createUserInDB: CreateUserInDB = async (data) => {
   if (db.usersByEmail[data.email]) {
-    throw new Error('User already registered')
+    throw new ValidationError('User already registered')
   }
 
   const hash = await argon2.hash(data.password)
@@ -33,7 +34,7 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
   const user = db.users[id]
 
   if (!user) {
-    throw new Error('User does not exist')
+    throw new NotFoundError('User does not exist')
   }
 
   if (
@@ -41,7 +42,7 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
     db.usersByEmail[data.email] &&
     db.usersByEmail[data.email] !== user.id
   ) {
-    throw new Error('This email is already in use')
+    throw new ValidationError('This email is already in use')
   }
 
   if (
@@ -49,7 +50,7 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
     db.usersByUsername[data.username] &&
     db.usersByUsername[data.username] !== user.id
   ) {
-    throw new Error('This username is already in use')
+    throw new ValidationError('This username is already in use')
   }
 
   const password = data.password
@@ -82,7 +83,7 @@ export const login: Login = async (data) => {
   const user = db.users[userId ?? '']
 
   if (!user || !(await argon2.verify(user.password, data.password))) {
-    throw new Error('Invalid email or password')
+    throw new ValidationError('Invalid email or password')
   }
 
   return user
@@ -92,7 +93,7 @@ export const getCurrentUserFromDB = async (id: string) => {
   const user = db.users[id]
 
   if (!user) {
-    throw new Error('User does not exist')
+    throw new NotFoundError('User does not exist')
   }
 
   return user
@@ -103,7 +104,7 @@ export const getProfileFromDB = async (username: string) => {
   const user = db.users[userId ?? '']
 
   if (!user) {
-    throw new Error('User does not exist')
+    throw new NotFoundError('User does not exist')
   }
 
   return user

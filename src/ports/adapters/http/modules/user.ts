@@ -24,7 +24,7 @@ export function registerUser (data: CreateUser) {
       TE.map(token => ({ user, token })),
     )),
     TE.map(getUserResponse),
-    TE.mapLeft(error => getError(error.message)),
+    TE.mapLeft(getError),
   )
 }
 
@@ -35,7 +35,7 @@ export const updateUser = ({ id, authHeader }: UserIdAndAuthHeader) => (data: Up
     data,
     user.updateUser(db.updateUserInDB(id)),
     TE.map(user => getUserResponse({ user, token })),
-    TE.mapLeft(error => getError(error.message)),
+    TE.mapLeft(getError),
   )
 }
 
@@ -53,7 +53,7 @@ export function login (data: LoginUser) {
       TE.map(token => ({ user, token })),
     )),
     TE.map(getUserResponse),
-    TE.mapLeft(error => getError(error.message)),
+    TE.mapLeft(getError),
   )
 }
 
@@ -66,7 +66,7 @@ export function getCurrentUser ({ id, authHeader }: UserIdAndAuthHeader) {
       E.toError,
     ),
     TE.map(user => getUserResponse({ user, token })),
-    TE.mapLeft(error => getError(error.message)),
+    TE.mapLeft(getError),
   )
 }
 
@@ -81,7 +81,7 @@ export function getProfile ({ username }: GetProfileInput) {
       E.toError,
     ),
     TE.map(getProfileResponse),
-    TE.mapLeft(error => getError(error.message)),
+    TE.mapLeft(getError),
   )
 }
 

@@ -4,6 +4,8 @@ import slugify from 'slugify'
 import { CreateArticle } from '@/core/article/types'
 import { CreateComment } from '@/core/comment/types'
 import { ProfileOutput } from '@/core/profile/types'
+
+import { NotFoundError } from '@/helpers/errors'
 import { dbInMemory as db } from './db'
 
 export const createArticleInDB = async (data: CreateArticle) => {
@@ -60,7 +62,7 @@ function getUserProfileFromDB (userId: string): ProfileOutput {
   const user = db.users[userId]
 
   if (!user) {
-    throw new Error('User does not exist')
+    throw new NotFoundError('User does not exist')
   }
 
   return {
