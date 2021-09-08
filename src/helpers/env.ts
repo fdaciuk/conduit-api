@@ -2,6 +2,7 @@ import { failure } from 'io-ts/PathReporter'
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
 import { withMessage, NonEmptyString } from 'io-ts-types'
+import { ValidationError } from '@/helpers/errors'
 
 type Envs =
   | 'PORT'
@@ -16,7 +17,7 @@ export const env = (value: Envs) => {
   return pipe(
     envCodec.decode(process.env[value]),
     E.fold(
-      (errors) => { throw new Error(failure(errors).join(':::')) },
+      (errors) => { throw new ValidationError(failure(errors).join(':::')) },
       (value) => value,
     ),
   )
