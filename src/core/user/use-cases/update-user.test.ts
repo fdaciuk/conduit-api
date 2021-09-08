@@ -36,7 +36,7 @@ it('Should not accept an update from a user with invalid username', async () => 
   return pipe(
     dataWithWrongUsername,
     updateUser(registerOk),
-    mapAll(error => expect(error).toEqual(new Error('Invalid slug. Please, use alphanumeric characters, dash and/or numbers.'))),
+    mapAll(error => expect(error).toEqual(new Error('Invalid slug. Please, use alphanumeric characters, dash, underline and/or numbers.'))),
   )()
 })
 

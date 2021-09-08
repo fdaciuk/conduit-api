@@ -15,6 +15,7 @@ export const createUserInDB: CreateUserInDB = async (data) => {
   const id = uuidv4()
 
   db.usersByEmail[data.email] = id
+  db.usersByUsername[data.username] = id
 
   const user = db.users[id] = {
     id,
@@ -43,6 +44,14 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
     throw new Error('This email is already in use')
   }
 
+  if (
+    data.username &&
+    db.usersByUsername[data.username] &&
+    db.usersByUsername[data.username] !== user.id
+  ) {
+    throw new Error('This username is already in use')
+  }
+
   const password = data.password
     ? (await argon2.hash(data.password))
     : user.password
@@ -51,11 +60,15 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
   delete db.usersByEmail[user.email]
   db.usersByEmail[email] = id
 
+  const username = data.username ?? user.username
+  delete db.usersByUsername[user.username]
+  db.usersByUsername[username] = id
+
   const newUser = db.users[id] = {
     id: user.id,
     email,
     password,
-    username: data.username ?? user.username,
+    username,
     bio: data.bio ?? user.bio,
     image: data.image ?? user.image,
   }
@@ -75,6 +88,23 @@ export const login: Login = async (data) => {
   return user
 }
 
-export const getCurrentUser = async (id: string) => {
-  return db.users[id]
+export const getCurrentUserFromDB = async (id: string) => {
+  const user = db.users[id]
+
+  if (!user) {
+    throw new Error('User does not exist')
+  }
+
+  return user
+}
+
+export const getProfileFromDB = async (username: string) => {
+  const userId = db.usersByUsername[username]
+  const user = db.users[userId ?? '']
+
+  if (!user) {
+    throw new Error('User does not exist')
+  }
+
+  return user
 }

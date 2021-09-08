@@ -70,6 +70,21 @@ export function getCurrentUser ({ id, authHeader }: UserIdAndAuthHeader) {
   )
 }
 
+type GetProfileInput = {
+  username: string
+}
+
+export function getProfile ({ username }: GetProfileInput) {
+  return pipe(
+    TE.tryCatch(
+      () => db.getProfile(username),
+      E.toError,
+    ),
+    TE.map(getProfileResponse),
+    TE.mapLeft(error => getError(error.message)),
+  )
+}
+
 type GetUserResponseInput = {
   user: db.database.DBUser
   token: string
@@ -88,5 +103,14 @@ const getUserResponse: GetUserResponse = ({ user, token }) => ({
     username: user.username,
     bio: user.bio ?? '',
     image: user.image ?? '',
+  },
+})
+
+const getProfileResponse = (user: db.database.DBUser) => ({
+  profile: {
+    username: user.username,
+    bio: user.bio ?? '',
+    image: user.image ?? '',
+    following: false,
   },
 })

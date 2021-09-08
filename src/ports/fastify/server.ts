@@ -105,6 +105,22 @@ app.put<UpdateUserApi>('/api/user', authOptions, (req, reply) => {
   )()
 })
 
+type GetProfileApi = {
+  Params: {
+    username: string
+  }
+}
+
+app.get<GetProfileApi>('/api/profiles/:username', (req, reply) => {
+  pipe(
+    user.getProfile({
+      username: req.params.username,
+    }),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(error => reply.code(422).send(error)),
+  )()
+})
+
 type CreateArticleApi = {
   Body: {
     article: CreateArticle
