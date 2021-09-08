@@ -4,15 +4,8 @@ export const createUserInDB = db.createUserInDB
 export const updateUserInDB = db.updateUserInDB
 export const login = db.login
 
-export const getCurrentUser = async (userId: string) => {
-  const user = await db.getCurrentUser(userId)
-
-  if (!user) {
-    throw new Error('User does not exist')
-  }
-
-  return user
-}
+export const getCurrentUser = db.getCurrentUserFromDB
+export const getProfile = db.getProfileFromDB
 
 export const createArticleInDB = db.createArticleInDB
 export const addCommentToAnArticleInDB = db.addCommentToAnArticleInDB

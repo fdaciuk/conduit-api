@@ -66,7 +66,7 @@ it('Should not accept an invalid article slug', async () => {
   return pipe(
     dataWithInvalidArticleSlug,
     addCommentToAnArticle(registerOk),
-    mapAll(result => expect(result).toEqual(new Error('Invalid slug. Please, use alphanumeric characters, dash and/or numbers.'))),
+    mapAll(result => expect(result).toEqual(new Error('Invalid slug. Please, use alphanumeric characters, dash, underline and/or numbers.'))),
   )()
 })
 
