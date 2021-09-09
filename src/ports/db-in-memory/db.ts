@@ -5,6 +5,8 @@ import { CommentOutput } from '@/core/comment/types'
 export type DBUser = Omit<UserOutput, 'token'> & {
   id: string
   password: string
+  following?: { [id: string]: true }
+  followers?: { [id: string]: true }
 }
 
 export type DBArticle = Omit<ArticleOutput, 'favorited' | 'author'> & {

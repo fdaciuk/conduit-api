@@ -80,7 +80,23 @@ export function getProfile ({ username }: GetProfileInput) {
       () => db.getProfile(username),
       E.toError,
     ),
-    TE.map(getProfileResponse),
+    TE.map(profile => getProfileResponse({ profile })),
+    TE.mapLeft(getError),
+  )
+}
+
+type FollowUserInput = {
+  userToFollow: string
+  userId: string
+}
+
+export function followUser ({ userToFollow, userId }: FollowUserInput) {
+  return pipe(
+    TE.tryCatch(
+      () => db.followUser({ userToFollow, userId }),
+      E.toError,
+    ),
+    TE.map(profile => getProfileResponse({ profile, userId })),
     TE.mapLeft(getError),
   )
 }
@@ -106,11 +122,16 @@ const getUserResponse: GetUserResponse = ({ user, token }) => ({
   },
 })
 
-const getProfileResponse = (user: db.database.DBUser) => ({
+type GetProfileResponseInput = {
+  profile: db.database.DBUser
+  userId?: string
+}
+
+const getProfileResponse = ({ profile, userId }: GetProfileResponseInput) => ({
   profile: {
-    username: user.username,
-    bio: user.bio ?? '',
-    image: user.image ?? '',
-    following: false,
+    username: profile.username,
+    bio: profile.bio ?? '',
+    image: profile.image ?? '',
+    following: !!profile.followers?.[userId ?? ''],
   },
 })
