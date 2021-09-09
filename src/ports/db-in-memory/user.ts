@@ -1,7 +1,11 @@
 import argon2 from 'argon2'
 import { v4 as uuidv4 } from 'uuid'
 import { CreateUser, UpdateUser, LoginUser } from '@/core/user/types'
-import { ValidationError, NotFoundError } from '@/helpers/errors'
+import {
+  ValidationError,
+  NotFoundError,
+  ForbiddenError,
+} from '@/helpers/errors'
 import { DBUser, dbInMemory as db } from './db'
 
 type CreateUserInDB = (data: CreateUser) => Promise<DBUser>
@@ -108,4 +112,36 @@ export const getProfileFromDB = async (username: string) => {
   }
 
   return user
+}
+
+type FollowUserInput = {
+  userToFollow: string
+  userId: string
+}
+
+export const followUser = async ({ userToFollow, userId }: FollowUserInput) => {
+  const user = db.users[userId]
+
+  if (!user) {
+    throw new NotFoundError('User does not exist')
+  }
+
+  const userToFollowId = db.usersByUsername[userToFollow]
+  const userToFollowData = db.users[userToFollowId ?? '']
+
+  if (!userToFollowData || !userToFollowId) {
+    throw new ForbiddenError(`User ${userToFollow} does not exist`)
+  }
+
+  if (userToFollowId === userId) {
+    throw new ForbiddenError('You cannot follow yourself')
+  }
+
+  user.following = user.following ?? {}
+  user.following[userToFollowId] = true
+
+  userToFollowData.followers = userToFollowData.followers ?? {}
+  userToFollowData.followers[userId] = true
+
+  return userToFollowData
 }

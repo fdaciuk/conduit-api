@@ -97,6 +97,20 @@ app.get('/api/profiles/:username', (req: Request, res: Response) => {
   )()
 })
 
+app.post('/api/profiles/:username/follow', auth, (req: Request, res: Response) => {
+  const username = 'username'
+  const payload = getPayload(req.auth)
+
+  pipe(
+    user.followUser({
+      userToFollow: req.params[username] ?? '',
+      userId: payload.id,
+    }),
+    TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
 app.post('/api/articles', auth, async (req: Request, res: Response) => {
   const payload = getPayload(req.auth)
 
