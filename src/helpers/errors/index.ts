@@ -22,7 +22,7 @@ export class AuthError extends DefaultError {
 
 export class ForbiddenError extends DefaultError {
   constructor (message: string) {
-    super({ name: 'ForbiddenError', code: 401, message })
+    super({ name: 'ForbiddenError', code: 403, message })
   }
 }
 
