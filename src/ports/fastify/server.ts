@@ -138,6 +138,17 @@ app.post<FollowUserApi>('/api/profiles/:username/follow', authOptions, (req, rep
   )()
 })
 
+app.delete<FollowUserApi>('/api/profiles/:username/follow', authOptions, (req, reply) => {
+  pipe(
+    user.unfollowUser({
+      userToUnfollow: req.params.username,
+      userId: req.raw.auth.id,
+    }),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
 type CreateArticleApi = {
   Body: {
     article: CreateArticle

@@ -101,6 +101,22 @@ export function followUser ({ userToFollow, userId }: FollowUserInput) {
   )
 }
 
+type UnfollowUserInput = {
+  userToUnfollow: string
+  userId: string
+}
+
+export function unfollowUser ({ userToUnfollow, userId }: UnfollowUserInput) {
+  return pipe(
+    TE.tryCatch(
+      () => db.unfollowUser({ userToUnfollow, userId }),
+      E.toError,
+    ),
+    TE.map(profile => getProfileResponse({ profile, userId })),
+    TE.mapLeft(getError),
+  )
+}
+
 type GetUserResponseInput = {
   user: db.database.DBUser
   token: string

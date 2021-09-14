@@ -145,3 +145,39 @@ export const followUser = async ({ userToFollow, userId }: FollowUserInput) => {
 
   return userToFollowData
 }
+
+type UnfollowUserInput = {
+  userToUnfollow: string
+  userId: string
+}
+
+export const unfollowUser = async ({ userToUnfollow, userId }: UnfollowUserInput) => {
+  const user = db.users[userId]
+
+  if (!user) {
+    throw new NotFoundError('User does not exist')
+  }
+
+  const userToUnfollowId = db.usersByUsername[userToUnfollow]
+  const userToUnfollowData = db.users[userToUnfollowId ?? '']
+
+  if (!userToUnfollowData || !userToUnfollowId) {
+    throw new ForbiddenError(`User ${userToUnfollow} does not exist`)
+  }
+
+  if (userToUnfollowId === userId) {
+    throw new ForbiddenError('You cannot follow yourself')
+  }
+
+  if (
+    !user.following?.[userToUnfollowId] ||
+    !userToUnfollowData.followers?.[userId]
+  ) {
+    throw new ForbiddenError(`You are not following ${userToUnfollow} yet`)
+  }
+
+  delete user.following[userToUnfollowId]
+  delete userToUnfollowData.followers[userId]
+
+  return userToUnfollowData
+}
