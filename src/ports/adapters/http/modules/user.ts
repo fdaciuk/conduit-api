@@ -72,15 +72,16 @@ export function getCurrentUser ({ id, authHeader }: UserIdAndAuthHeader) {
 
 type GetProfileInput = {
   username: string
+  userId?: string
 }
 
-export function getProfile ({ username }: GetProfileInput) {
+export function getProfile ({ username, userId }: GetProfileInput) {
   return pipe(
     TE.tryCatch(
       () => db.getProfile(username),
       E.toError,
     ),
-    TE.map(profile => getProfileResponse({ profile })),
+    TE.map(profile => getProfileResponse({ profile, userId })),
     TE.mapLeft(getError),
   )
 }

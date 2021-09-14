@@ -9,16 +9,16 @@ import * as TE from 'fp-ts/TaskEither'
 import { env } from '@/helpers/env'
 import { Slug } from '@/core/types/slug'
 import { CreateUser, UpdateUser, LoginUser } from '@/core/user/types'
-import { CreateArticle } from '@/core/article/types'
+import { CreateArticle, AuthorId } from '@/core/article/types'
 import { CreateComment } from '@/core/comment/types'
-import { authMiddleware } from '@/ports/adapters/http/http'
+import { authMiddleware, getPayload } from '@/ports/adapters/http/http'
 import * as user from '@/ports/adapters/http/modules/user'
 import * as article from '@/ports/adapters/http/modules/article'
 import { JWTPayload } from '@/ports/adapters/jwt'
 import http from 'http'
 
 type CustomRequest = http.IncomingMessage & {
-  auth: JWTPayload
+  auth?: JWTPayload
 }
 
 const app = fastify<http.Server, CustomRequest>({ logger: true })
@@ -77,9 +77,11 @@ const auth: AuthPreValidation = (req, reply, done) => {
 const authOptions = { preValidation: auth }
 
 app.get('/api/user', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
   pipe(
     user.getCurrentUser({
-      id: req.raw.auth.id,
+      id: payload.id,
       authHeader: req.headers.authorization,
     }),
     TE.map(result => reply.send(result)),
@@ -94,10 +96,12 @@ type UpdateUserApi = {
 }
 
 app.put<UpdateUserApi>('/api/user', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
   pipe(
     req.body.user,
     user.updateUser({
-      id: req.raw.auth.id,
+      id: payload.id,
       authHeader: req.headers.authorization,
     }),
     TE.map(result => reply.send(result)),
@@ -105,16 +109,35 @@ app.put<UpdateUserApi>('/api/user', authOptions, (req, reply) => {
   )()
 })
 
+const tryAuth: AuthPreValidation = (req, _reply, done) => {
+  pipe(
+    authMiddleware(req.headers.authorization),
+    TE.map((payload) => {
+      req.raw.auth = payload
+      return done()
+    }),
+    TE.mapLeft(() => {
+      req.raw.auth = undefined
+      return done()
+    }),
+  )()
+}
+
+const tryAuthOptions = { preValidation: tryAuth }
+
 type GetProfileApi = {
   Params: {
     username: string
   }
 }
 
-app.get<GetProfileApi>('/api/profiles/:username', (req, reply) => {
+app.get<GetProfileApi>('/api/profiles/:username', tryAuthOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
   pipe(
     user.getProfile({
       username: req.params.username,
+      userId: payload.id,
     }),
     TE.map(result => reply.send(result)),
     TE.mapLeft(result => reply.code(result.code).send(result.error)),
@@ -128,10 +151,12 @@ type FollowUserApi = {
 }
 
 app.post<FollowUserApi>('/api/profiles/:username/follow', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
   pipe(
     user.followUser({
       userToFollow: req.params.username,
-      userId: req.raw.auth.id,
+      userId: payload.id,
     }),
     TE.map(result => reply.send(result)),
     TE.mapLeft(result => reply.code(result.code).send(result.error)),
@@ -139,10 +164,12 @@ app.post<FollowUserApi>('/api/profiles/:username/follow', authOptions, (req, rep
 })
 
 app.delete<FollowUserApi>('/api/profiles/:username/follow', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
   pipe(
     user.unfollowUser({
       userToUnfollow: req.params.username,
-      userId: req.raw.auth.id,
+      userId: payload.id,
     }),
     TE.map(result => reply.send(result)),
     TE.mapLeft(result => reply.code(result.code).send(result.error)),
@@ -156,9 +183,12 @@ type CreateArticleApi = {
 }
 
 app.post<CreateArticleApi>('/api/articles', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
   const data = {
     ...req.body.article,
-    authorId: req.raw.auth.id,
+    // TODO
+    authorId: payload.id as AuthorId,
   }
 
   pipe(
@@ -180,9 +210,12 @@ type AddCommentApi = {
 }
 
 app.post<AddCommentApi>('/api/articles/:slug/comments', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
   const data = {
     ...req.body.comment,
-    authorId: req.raw.auth.id,
+    // TODO
+    authorId: payload.id as AuthorId,
     articleSlug: req.params.slug,
   }
 
