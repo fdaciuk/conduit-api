@@ -104,8 +104,8 @@ export const getCurrentUserFromDB = async (id: string) => {
 }
 
 export const getProfileFromDB = async (username: string) => {
-  const userId = db.usersByUsername[username]
-  const user = db.users[userId ?? '']
+  const profileId = db.usersByUsername[username]
+  const user = db.users[profileId ?? '']
 
   if (!user) {
     throw new NotFoundError('User does not exist')

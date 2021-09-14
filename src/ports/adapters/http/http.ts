@@ -1,7 +1,7 @@
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
-import { verifyToken } from '@/ports/adapters/jwt'
+import { verifyToken, JWTPayload } from '@/ports/adapters/jwt'
 import { DefaultError, AuthError } from '@/helpers/errors'
 
 export * from '@/ports/fastify/server'
@@ -31,4 +31,8 @@ export function authMiddleware (authHeader: string = '') {
     ),
     TE.mapLeft(() => getError(new AuthError())),
   )
+}
+
+export function getPayload (payload?: JWTPayload) {
+  return payload ?? { id: '' }
 }

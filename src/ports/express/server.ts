@@ -8,7 +8,7 @@ import * as TE from 'fp-ts/TaskEither'
 import cors from 'cors'
 import * as user from '@/ports/adapters/http/modules/user'
 import * as article from '@/ports/adapters/http/modules/article'
-import { authMiddleware } from '@/ports/adapters/http/http'
+import { authMiddleware, getPayload } from '@/ports/adapters/http/http'
 import { env } from '@/helpers'
 import { JWTPayload } from '@/ports/adapters/jwt'
 
@@ -158,10 +158,6 @@ app.post('/api/articles/:slug/comments', auth, async (req: Request, res: Respons
     TE.mapLeft(result => res.status(result.code).json(result.error)),
   )()
 })
-
-function getPayload (payload?: JWTPayload) {
-  return payload ?? { id: '' }
-}
 
 export function start () {
   app.listen(PORT, () => {
