@@ -1,5 +1,5 @@
 import * as jwt from '@/ports/jwt/jose'
-import { AuthorId } from '@/core/article/types'
+import { AuthorId, AuthorIdOutput } from '@/core/profile/types'
 import { ValidationError } from '@/helpers/errors'
 
 export type JWTPayload = {
@@ -7,7 +7,7 @@ export type JWTPayload = {
 }
 
 export type JWTPayloadInput = {
-  id: string
+  id: AuthorIdOutput
 }
 
 type ExpirationTime = string
