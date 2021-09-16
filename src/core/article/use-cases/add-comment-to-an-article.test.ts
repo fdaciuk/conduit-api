@@ -7,21 +7,15 @@ import { CreateComment } from '@/core/comment/types'
 import { mapAll, unsafe } from '@/config/tests/fixtures'
 
 const data: CreateComment = {
-  authorId: unsafe('f42e7b0a-d277-4eed-bb23-6d5428a82978'),
+  authorId: 'f42e7b0a-d277-4eed-bb23-6d5428a82978',
   articleSlug: unsafe('article-slug'),
   body: unsafe('Comment for an article'),
 }
 
 const dataWithInvalidBody: CreateComment = {
-  authorId: unsafe('f42e7b0a-d277-4eed-bb23-6d5428a82978'),
+  authorId: 'f42e7b0a-d277-4eed-bb23-6d5428a82978',
   articleSlug: unsafe('article-slug'),
   body: unsafe(''),
-}
-
-const dataWithInvalidAuthorId: CreateComment = {
-  authorId: unsafe(''),
-  articleSlug: unsafe('article-slug'),
-  body: unsafe('Comment for an article'),
 }
 
 const dataWithInvalidArticleSlug: CreateComment = {
@@ -51,14 +45,6 @@ it('Should not accept an empty comment', async () => {
     dataWithInvalidBody,
     addCommentToAnArticle(registerOk),
     mapAll(result => expect(result).toEqual(new Error('The body of the comment must not be empty.'))),
-  )()
-})
-
-it('Should not accept an invalid author ID', async () => {
-  return pipe(
-    dataWithInvalidAuthorId,
-    addCommentToAnArticle(registerOk),
-    mapAll(result => expect(result).toEqual(new Error('Invalid author ID'))),
   )()
 })
 

@@ -9,7 +9,7 @@ import * as TE from 'fp-ts/TaskEither'
 import { env } from '@/helpers/env'
 import { Slug } from '@/core/types/slug'
 import { CreateUser, UpdateUser, LoginUser } from '@/core/user/types'
-import { CreateArticle, AuthorId } from '@/core/article/types'
+import { CreateArticle } from '@/core/article/types'
 import { CreateComment } from '@/core/comment/types'
 import { authMiddleware, getPayload } from '@/ports/adapters/http/http'
 import * as user from '@/ports/adapters/http/modules/user'
@@ -187,8 +187,7 @@ app.post<CreateArticleApi>('/api/articles', authOptions, (req, reply) => {
 
   const data = {
     ...req.body.article,
-    // TODO
-    authorId: payload.id as AuthorId,
+    authorId: payload.id,
   }
 
   pipe(
@@ -214,8 +213,7 @@ app.post<AddCommentApi>('/api/articles/:slug/comments', authOptions, (req, reply
 
   const data = {
     ...req.body.comment,
-    // TODO
-    authorId: payload.id as AuthorId,
+    authorId: payload.id,
     articleSlug: req.params.slug,
   }
 
