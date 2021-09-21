@@ -23,6 +23,14 @@ articleRoutes.post('/api/articles', auth, async (req: Request, res: Response) =>
   )()
 })
 
+articleRoutes.get('/api/articles', (_req: Request, response: Response) => {
+  pipe(
+    article.fetchArticles(),
+    TE.map(result => response.json(result)),
+    TE.mapLeft(result => response.status(result.code).json(result.error)),
+  )()
+})
+
 articleRoutes.post('/api/articles/:slug/comments', auth, async (req: Request, res: Response) => {
   const payload = getPayload(req.auth)
   const slugProp = 'slug'

@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid'
-
 import { NotFoundError } from '@/helpers/errors'
 import { dbInMemory as db } from './db'
 
@@ -39,6 +38,28 @@ export const createArticleInDB: CreateArticleInDB<ArticleReturned> = async (data
     ...registeredArticle,
     author,
   }
+}
+
+export const getArticlesFromDB = async () => {
+  const articles = db.articles
+
+  return Object.values(articles)
+    .map(article => {
+      const { authorId, ...rest } = article
+      const author = db.users[authorId]
+
+      if (!author) {
+        throw new NotFoundError('User does not exist')
+      }
+
+      return {
+        ...rest,
+        favorited: false, // TODO: Mock
+        authorId,
+        author,
+      }
+    })
+    .sort((a, b) => a.createdAt > b.createdAt ? -1 : 1)
 }
 
 type CommentReturned = DBComment & {
