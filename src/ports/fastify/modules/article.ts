@@ -30,6 +30,14 @@ app.post<CreateArticleApi>('/api/articles', authOptions, (req, reply) => {
   )()
 })
 
+app.get('/api/articles', (_req, reply) => {
+  pipe(
+    article.fetchArticles(),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
 type AddCommentApi = {
   Body: {
     comment: CreateComment

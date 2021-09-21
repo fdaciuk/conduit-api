@@ -51,6 +51,27 @@ export const createArticleInDB: CreateArticleInDB<ArticleReturned> = async (data
   }
 }
 
+export const getArticlesFromDB = async () => {
+  const articles = await prisma.article.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+    include: {
+      author: true,
+      tagList: true,
+    },
+  })
+
+  return articles.map(article => ({
+    ...article,
+    favorited: false, // TODO: Mock
+    favoritesCount: 0, // TODO: Mock
+    tagList: article.tagList.map(({ name }) => name),
+    createdAt: article.createdAt.toISOString(),
+    updatedAt: article.updatedAt.toISOString(),
+  }))
+}
+
 type CommentReturned = Omit<Comment, 'createdAt' | 'updatedAt'> & {
   createdAt: string
   updatedAt: string

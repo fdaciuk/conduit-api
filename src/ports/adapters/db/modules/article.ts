@@ -25,6 +25,19 @@ export const createArticleInDB: CreateArticleInDB = async (data) => {
   }
 }
 
+export const getArticlesFromDB = async () => {
+  const articles = await db.getArticlesFromDB()
+  return articles.map(article => ({
+    ...article,
+    author: {
+      username: article.author.username,
+      bio: article.author.bio ?? '',
+      image: article.author.image ?? '',
+      following: false,
+    },
+  }))
+}
+
 type AddCommentToAnArticleInDB = (data: CreateComment) => Promise<CommentOutput>
 export const addCommentToAnArticleInDB: AddCommentToAnArticleInDB = async (data) => {
   const comment = await db.addCommentToAnArticleInDB(data)
