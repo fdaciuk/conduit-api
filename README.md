@@ -26,7 +26,10 @@ yarn test:watch
 | Script                        | Description                                                   |
 | ----------------------------- | ------------------------------------------------------------- |
 | `yarn start`                  | Run production server                                         |
-| `yarn dev`                    | Run dev server                                                |
+| `yarn dev`                    | Get database up and run dev server                            |
+| `yarn server`                 | Run only dev server                                           |
+| `yarn clean:db`               | Destroy database                                              |
+| `yarn migrate <name>`         | Run Prisma migration (You must provide a name)                |
 | `yarn test`                   | Run unit and integration tests once (great to be used in CI)  |
 | `yarn test:watch`             | Run unit tests in watch mode                                  |
 | `yarn test:integration`       | Run integration tests once                                    |
