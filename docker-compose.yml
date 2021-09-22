@@ -1,0 +1,19 @@
+version: "3"
+services:
+  db:
+    image: "postgres:13-alpine"
+    container_name: "conduit-db"
+    restart: "always"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    env_file:
+      - .env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./src/config/docker/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - ${DB_PORT}:5432
+
+volumes:
+  postgres-data:

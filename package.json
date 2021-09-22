@@ -8,7 +8,9 @@
   "private": true,
   "scripts": {
     "start": "node dist/src/index.js",
-    "dev": "nodemon --exec sucrase-node src/index.ts",
+    "dev": "docker-compose down && docker-compose up -d && yarn server",
+    "server": "nodemon --exec sucrase-node src/index.ts",
+    "clean:db": "docker-compose down --volumes --remove-orphans",
     "test": "jest --passWithNoTests && yarn test:integration",
     "test:watch": "jest --watch",
     "test:integration": "jest --passWithNoTests --config jest.config.integration.js",
