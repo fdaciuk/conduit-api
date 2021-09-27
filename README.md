@@ -28,7 +28,6 @@ yarn test:watch
 | `yarn start`                  | Run production server                                         |
 | `yarn dev`                    | Get database up and run dev server                            |
 | `yarn server`                 | Run only dev server                                           |
-| `yarn server`                 | Run only dev server                                           |
 | `yarn docker:up`              | Get docker configuration up                                   |
 | `yarn docker:down`            | Get docker configuration down                                 |
 | `yarn docker:destroy`         | Destroy database and all docker data                          |
