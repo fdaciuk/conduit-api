@@ -8,9 +8,11 @@
   "private": true,
   "scripts": {
     "start": "node dist/src/index.js",
-    "dev": "docker-compose down && docker-compose up -d && yarn server",
+    "dev": "yarn docker:down && yarn docker:up && yarn server",
     "server": "nodemon --exec sucrase-node src/index.ts",
-    "clean:db": "docker-compose down --volumes --remove-orphans",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:destroy": "docker-compose down --volumes --remove-orphans",
     "migrate": "prisma migrate dev --name",
     "test": "jest --passWithNoTests && yarn test:integration",
     "test:watch": "jest --watch",
