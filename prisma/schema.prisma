@@ -22,23 +22,25 @@ model User {
   following      Follower[] @relation("Following")
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
+
+  @@index([email, username])
 }
 
 model Follower {
   userId      String
-  user        User   @relation("Follower", fields: [userId], references: [id])
+  user        User    @relation("Follower", fields: [userId], references: [id])
   followingId String
-  following   User   @relation("Following", fields: [followingId], references: [id])
+  following   User    @relation("Following", fields: [followingId], references: [id])
 
   @@id([userId, followingId])
 }
 
 model Tag {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   name      String
   articles  Article[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Article {
