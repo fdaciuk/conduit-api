@@ -119,7 +119,7 @@ export function unfollowUser ({ userToUnfollow, userId }: UnfollowUserInput) {
 }
 
 type GetUserResponseInput = {
-  user: db.database.DBUser
+  user: db.DBUser
   token: string
 }
 
@@ -140,7 +140,7 @@ const getUserResponse: GetUserResponse = ({ user, token }) => ({
 })
 
 type GetProfileResponseInput = {
-  profile: db.database.DBUser
+  profile: db.DBUser
   userId?: string
 }
 

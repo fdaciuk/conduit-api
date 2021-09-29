@@ -1,13 +1,6 @@
-import { UserOutput } from '@/core/user/types'
 import { ArticleOutput } from '@/core/article/types'
 import { CommentOutput } from '@/core/comment/types'
-
-export type DBUser = Omit<UserOutput, 'token'> & {
-  id: string
-  password: string
-  following?: { [id: string]: true }
-  followers?: { [id: string]: true }
-}
+import { DBUser } from '@/ports/adapters/db/types'
 
 export type DBArticle = Omit<ArticleOutput, 'favorited' | 'author'> & {
   id: string

@@ -32,6 +32,7 @@ export const createUserCodec = t.type({
 })
 
 export type CreateUser = t.TypeOf<typeof createUserCodec>
+export type CreateUserOutput = t.OutputOf<typeof createUserCodec>
 
 export const updateUserCodec = t.partial({
   email: emailCodec,
