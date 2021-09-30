@@ -29,8 +29,14 @@ export const createUserInDB: CreateUserInDB = async (data) => {
   return user
 }
 
-type UpdateUserInDB = (id: string) => (data: UpdateUser) => Promise<DBUser>
+type Login = (data: LoginUser) => Promise<DBUser | undefined>
+export const login: Login = async (data) => {
+  const userId = db.usersByEmail[data.email]
+  const user = db.users[userId ?? '']
+  return user
+}
 
+type UpdateUserInDB = (id: string) => (data: UpdateUser) => Promise<DBUser>
 export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
   const user = db.users[id]
 
@@ -76,18 +82,6 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
   }
 
   return newUser
-}
-
-type Login = (data: LoginUser) => Promise<DBUser>
-export const login: Login = async (data) => {
-  const userId = db.usersByEmail[data.email]
-  const user = db.users[userId ?? '']
-
-  if (!user || !(await argon2.verify(user.password, data.password))) {
-    throw new ValidationError('Invalid email or password')
-  }
-
-  return user
 }
 
 export const getCurrentUserFromDB = async (id: string) => {
