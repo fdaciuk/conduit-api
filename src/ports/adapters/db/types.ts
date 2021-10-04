@@ -1,4 +1,8 @@
-import { UserOutput, CreateUserOutput } from '@/core/user/types'
+import {
+  UserOutput,
+  CreateUserOutput,
+  UpdateUserOutput,
+} from '@/core/user/types'
 
 export type DBUser = Omit<UserOutput, 'token'> & {
   id: string
@@ -12,3 +16,10 @@ type CreateUserData = CreateUserOutput & {
 }
 
 export type CreateUserInDB = (data: CreateUserData) => Promise<DBUser>
+
+type UpdateUserData = UpdateUserOutput & {
+  password?: string
+}
+
+export type UpdateUserInDB = (id: string) =>
+  (data: UpdateUserData) => Promise<DBUser>

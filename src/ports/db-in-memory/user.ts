@@ -1,12 +1,11 @@
-import argon2 from 'argon2'
 import { v4 as uuidv4 } from 'uuid'
-import { UpdateUser, LoginUser } from '@/core/user/types'
+import { LoginUser } from '@/core/user/types'
 import {
   ValidationError,
   NotFoundError,
   ForbiddenError,
 } from '@/helpers/errors'
-import { CreateUserInDB, DBUser } from '@/ports/adapters/db/types'
+import { CreateUserInDB, UpdateUserInDB, DBUser } from '@/ports/adapters/db/types'
 import { dbInMemory as db } from './db'
 
 export const createUserInDB: CreateUserInDB = async (data) => {
@@ -36,7 +35,6 @@ export const login: Login = async (data) => {
   return user
 }
 
-type UpdateUserInDB = (id: string) => (data: UpdateUser) => Promise<DBUser>
 export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
   const user = db.users[id]
 
@@ -60,10 +58,6 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
     throw new ValidationError('This username is already in use')
   }
 
-  const password = data.password
-    ? (await argon2.hash(data.password))
-    : user.password
-
   const email = data.email ?? user.email
   delete db.usersByEmail[user.email]
   db.usersByEmail[email] = id
@@ -75,8 +69,8 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
   const newUser = db.users[id] = {
     id: user.id,
     email,
-    password,
     username,
+    password: data.password ?? user.password,
     bio: data.bio ?? user.bio,
     image: data.image ?? user.image,
   }
