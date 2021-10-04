@@ -65,3 +65,11 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
     throw new NotFoundError('User does not exist')
   }
 }
+
+export const getCurrentUserFromDB = async (id: string) => {
+  return prisma.user.findUnique({
+    where: {
+      id,
+    },
+  })
+}

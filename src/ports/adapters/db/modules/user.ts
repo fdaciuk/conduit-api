@@ -2,6 +2,7 @@ import argon2 from 'argon2'
 import { CreateUser, UpdateUser, LoginUser } from '@/core/user/types'
 import {
   ValidationError,
+  NotFoundError,
 } from '@/helpers/errors'
 import { database as db } from '../db'
 import { DBUser } from '../types'
@@ -41,7 +42,20 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
   })
 }
 
-export const getCurrentUser = db.getCurrentUserFromDB
+export const getCurrentUser = async (id: string) => {
+  const user = await db.getCurrentUserFromDB(id)
+
+  if (!user) {
+    throw new NotFoundError('User does not exist')
+  }
+
+  return {
+    ...user,
+    bio: user.bio ?? undefined,
+    image: user.image ?? undefined,
+  }
+}
+
 export const getProfile = db.getProfileFromDB
 export const followUser = db.followUser
 export const unfollowUser = db.unfollowUser

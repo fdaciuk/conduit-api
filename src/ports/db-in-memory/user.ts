@@ -79,12 +79,7 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
 }
 
 export const getCurrentUserFromDB = async (id: string) => {
-  const user = db.users[id]
-
-  if (!user) {
-    throw new NotFoundError('User does not exist')
-  }
-
+  const user = db.users[id] ?? null
   return user
 }
 
