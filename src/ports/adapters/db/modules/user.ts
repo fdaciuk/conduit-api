@@ -1,5 +1,5 @@
 import argon2 from 'argon2'
-import { CreateUser, LoginUser } from '@/core/user/types'
+import { CreateUser, UpdateUser, LoginUser } from '@/core/user/types'
 import {
   ValidationError,
 } from '@/helpers/errors'
@@ -29,7 +29,17 @@ export const login: Login = async (data) => {
   return result
 }
 
-export const updateUserInDB = db.updateUserInDB
+type UpdateUserInDB = (id: string) => (data: UpdateUser) => Promise<DBUser>
+export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
+  const password = data.password
+    ? (await argon2.hash(data.password))
+    : undefined
+
+  return db.updateUserInDB(id)({
+    ...data,
+    password,
+  })
+}
 
 export const getCurrentUser = db.getCurrentUserFromDB
 export const getProfile = db.getProfileFromDB
