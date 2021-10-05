@@ -1,11 +1,16 @@
 import { v4 as uuidv4 } from 'uuid'
-import { LoginUser } from '@/core/user/types'
 import {
   ValidationError,
   NotFoundError,
   ForbiddenError,
 } from '@/helpers/errors'
-import { CreateUserInDB, UpdateUserInDB, DBUser } from '@/ports/adapters/db/types'
+import {
+  CreateUserInDB,
+  Login,
+  UpdateUserInDB,
+  GetCurrentUserFromDB,
+  GetProfileFromDB,
+} from '@/ports/adapters/db/types'
 import { dbInMemory as db } from './db'
 
 export const createUserInDB: CreateUserInDB = async (data) => {
@@ -28,11 +33,10 @@ export const createUserInDB: CreateUserInDB = async (data) => {
   return user
 }
 
-type Login = (data: LoginUser) => Promise<DBUser | undefined>
 export const login: Login = async (data) => {
   const userId = db.usersByEmail[data.email]
   const user = db.users[userId ?? '']
-  return user
+  return user ?? null
 }
 
 export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
@@ -78,20 +82,15 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
   return newUser
 }
 
-export const getCurrentUserFromDB = async (id: string) => {
-  const user = db.users[id] ?? null
-  return user
+export const getCurrentUserFromDB: GetCurrentUserFromDB = async (id) => {
+  const user = db.users[id]
+  return user ?? null
 }
 
-export const getProfileFromDB = async (username: string) => {
+export const getProfileFromDB: GetProfileFromDB = async (username) => {
   const profileId = db.usersByUsername[username]
   const user = db.users[profileId ?? '']
-
-  if (!user) {
-    throw new NotFoundError('User does not exist')
-  }
-
-  return user
+  return user ?? null
 }
 
 type FollowUserInput = {

@@ -42,7 +42,8 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
   })
 }
 
-export const getCurrentUser = async (id: string) => {
+type GetCurrentUserFromDB = (id: string) => Promise<DBUser>
+export const getCurrentUser: GetCurrentUserFromDB = async (id) => {
   const user = await db.getCurrentUserFromDB(id)
 
   if (!user) {
@@ -56,6 +57,20 @@ export const getCurrentUser = async (id: string) => {
   }
 }
 
-export const getProfile = db.getProfileFromDB
+type GetProfileFromDB = (username: string) => Promise<DBUser>
+export const getProfile: GetProfileFromDB = async (username) => {
+  const user = await db.getProfileFromDB(username)
+
+  if (!user) {
+    throw new NotFoundError('User does not exist')
+  }
+
+  return {
+    ...user,
+    bio: user.bio ?? undefined,
+    image: user.image ?? undefined,
+  }
+}
+
 export const followUser = db.followUser
 export const unfollowUser = db.unfollowUser
