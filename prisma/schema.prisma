@@ -27,10 +27,10 @@ model User {
 }
 
 model Follower {
-  userId      String
-  user        User    @relation("Follower", fields: [userId], references: [id])
-  followingId String
-  following   User    @relation("Following", fields: [followingId], references: [id])
+  userId         String
+  followingId    String
+  whoIsFollowing User    @relation("Follower", fields: [followingId], references: [id])
+  following      User    @relation("Following", fields: [userId], references: [id])
 
   @@id([userId, followingId])
 }

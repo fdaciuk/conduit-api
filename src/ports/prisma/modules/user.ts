@@ -1,14 +1,16 @@
-import { User } from '@prisma/client'
+import { User, Follower } from '@prisma/client'
 import {
   CreateUserInDB,
   UpdateUserInDB,
   GetCurrentUserFromDB,
   GetProfileFromDB,
   Login,
+  FollowUser,
 } from '@/ports/adapters/db/types'
 import {
   ValidationError,
   NotFoundError,
+  ForbiddenError,
 } from '@/helpers/errors'
 import { prisma } from '../prisma'
 
@@ -72,7 +74,73 @@ export const getCurrentUserFromDB: GetCurrentUserFromDB<User> = async (id) => {
 }
 
 export const getProfileFromDB: GetProfileFromDB<User> = async (username) => {
-  return prisma.user.findUnique({
+  const profile = await prisma.user.findUnique({
     where: { username },
+    include: {
+      following: true,
+      whoIsFollowing: true,
+    },
   })
+
+  if (!profile) {
+    throw new ForbiddenError(`User ${username} does not exist`)
+  }
+
+  return {
+    ...profile,
+    following: transformFollower('followingId', profile.following),
+    followers: transformFollower('userId', profile.whoIsFollowing),
+  }
+}
+
+export const followUser: FollowUser<User> = async ({ userToFollow, userId }) => {
+  const userToFollowData = await prisma.user.findUnique({
+    select: { id: true },
+    where: { username: userToFollow },
+  })
+
+  if (!userToFollowData) {
+    throw new ForbiddenError(`User ${userToFollow} does not exist`)
+  }
+
+  if (userToFollowData.id === userId) {
+    throw new ForbiddenError('You cannot follow yourself')
+  }
+
+  try {
+    await prisma.follower.create({
+      data: {
+        userId,
+        followingId: userToFollowData.id,
+      },
+    })
+  } catch (e) {}
+
+  const profile = await prisma.user.findUnique({
+    where: { username: userToFollow },
+    include: {
+      following: true,
+      whoIsFollowing: true,
+    },
+  })
+
+  if (!profile) {
+    throw new ForbiddenError(`User ${userToFollow} does not exist`)
+  }
+
+  console.log('profile:', profile)
+
+  return {
+    ...profile,
+    following: transformFollower('followingId', profile.following),
+    followers: transformFollower('userId', profile.whoIsFollowing),
+  }
+}
+
+type Field = keyof Follower
+function transformFollower (field: Field, data: Follower[]) {
+  return data.reduce((acc, f) => {
+    acc[f[field]] = true
+    return acc
+  }, {} as { [key: string]: boolean })
 }

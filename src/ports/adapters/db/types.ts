@@ -32,3 +32,10 @@ export type GetCurrentUserFromDB<T = DBUser> = (id: string) =>
 
 export type GetProfileFromDB<T = DBUser> = (username: string) =>
   Promise<T | null>
+
+type FollowUserInput = {
+  userToFollow: string
+  userId: string
+}
+
+export type FollowUser<T = DBUser> = (input: FollowUserInput) => Promise<T>
