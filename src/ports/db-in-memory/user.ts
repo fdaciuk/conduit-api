@@ -10,6 +10,7 @@ import {
   UpdateUserInDB,
   GetCurrentUserFromDB,
   GetProfileFromDB,
+  FollowUser,
 } from '@/ports/adapters/db/types'
 import { dbInMemory as db } from './db'
 
@@ -93,12 +94,7 @@ export const getProfileFromDB: GetProfileFromDB = async (username) => {
   return user ?? null
 }
 
-type FollowUserInput = {
-  userToFollow: string
-  userId: string
-}
-
-export const followUser = async ({ userToFollow, userId }: FollowUserInput) => {
+export const followUser: FollowUser = async ({ userToFollow, userId }) => {
   const user = db.users[userId]
 
   if (!user) {

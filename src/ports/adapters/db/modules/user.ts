@@ -72,5 +72,20 @@ export const getProfile: GetProfileFromDB = async (username) => {
   }
 }
 
-export const followUser = db.followUser
+type FollowUserInput = {
+  userToFollow: string
+  userId: string
+}
+
+type FollowUser = (input: FollowUserInput) => Promise<DBUser>
+export const followUser: FollowUser = async (input) => {
+  const profile = await db.followUser(input)
+
+  return {
+    ...profile,
+    bio: profile.bio ?? undefined,
+    image: profile.image ?? undefined,
+  }
+}
+
 export const unfollowUser = db.unfollowUser
