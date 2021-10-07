@@ -11,6 +11,7 @@ import {
   GetCurrentUserFromDB,
   GetProfileFromDB,
   FollowUser,
+  UnfollowUser,
 } from '@/ports/adapters/db/types'
 import { dbInMemory as db } from './db'
 
@@ -121,12 +122,7 @@ export const followUser: FollowUser = async ({ userToFollow, userId }) => {
   return userToFollowData
 }
 
-type UnfollowUserInput = {
-  userToUnfollow: string
-  userId: string
-}
-
-export const unfollowUser = async ({ userToUnfollow, userId }: UnfollowUserInput) => {
+export const unfollowUser: UnfollowUser = async ({ userToUnfollow, userId }) => {
   const user = db.users[userId]
 
   if (!user) {
@@ -141,7 +137,7 @@ export const unfollowUser = async ({ userToUnfollow, userId }: UnfollowUserInput
   }
 
   if (userToUnfollowId === userId) {
-    throw new ForbiddenError('You cannot follow yourself')
+    throw new ForbiddenError('You cannot unfollow yourself')
   }
 
   if (

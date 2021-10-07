@@ -39,3 +39,10 @@ type FollowUserInput = {
 }
 
 export type FollowUser<T = DBUser> = (input: FollowUserInput) => Promise<T>
+
+type UnfollowUserInput = {
+  userToUnfollow: string
+  userId: string
+}
+
+export type UnfollowUser<T = DBUser> = (input: UnfollowUserInput) => Promise<T>
