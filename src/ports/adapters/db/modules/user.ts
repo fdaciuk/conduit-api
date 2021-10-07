@@ -88,4 +88,18 @@ export const followUser: FollowUser = async (input) => {
   }
 }
 
-export const unfollowUser = db.unfollowUser
+type UnfollowUserInput = {
+  userToUnfollow: string
+  userId: string
+}
+
+type UnfollowUser = (input: UnfollowUserInput) => Promise<DBUser>
+export const unfollowUser: UnfollowUser = async (input) => {
+  const profile = await db.unfollowUser(input)
+
+  return {
+    ...profile,
+    bio: profile.bio ?? undefined,
+    image: profile.image ?? undefined,
+  }
+}
