@@ -60,6 +60,15 @@ CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 CREATE INDEX "User_email_username_idx" ON "User"("email", "username");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Tag_name_key" ON "Tag"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Article_slug_key" ON "Article"("slug");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Article_title_key" ON "Article"("title");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_ArticleToTag_AB_unique" ON "_ArticleToTag"("A", "B");
 
 -- CreateIndex

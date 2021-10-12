@@ -1,11 +1,5 @@
-import { ArticleOutput } from '@/core/article/types'
 import { CommentOutput } from '@/core/comment/types'
-import { DBUser } from '@/ports/adapters/db/types'
-
-export type DBArticle = Omit<ArticleOutput, 'favorited' | 'author'> & {
-  id: string
-  authorId: string
-}
+import { DBUser, DBArticle } from '@/ports/adapters/db/types'
 
 export type DBComment = Omit<CommentOutput, 'author'> & {
   articleId: string

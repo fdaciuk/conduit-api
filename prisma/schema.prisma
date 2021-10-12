@@ -37,7 +37,7 @@ model Follower {
 
 model Tag {
   id        String    @id @default(uuid())
-  name      String
+  name      String    @unique
   articles  Article[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -47,8 +47,8 @@ model Article {
   id          String   @id @default(uuid())
   authorId    String
   author      User     @relation(fields: [authorId], references: [id])
-  slug        String
-  title       String
+  slug        String   @unique
+  title       String   @unique
   description String
   body        String
   tagList     Tag[]

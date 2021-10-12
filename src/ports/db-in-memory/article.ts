@@ -1,26 +1,31 @@
 import { v4 as uuidv4 } from 'uuid'
-import slugify from 'slugify'
 
-import { CreateArticle } from '@/core/article/types'
 import { CreateComment } from '@/core/comment/types'
 import { ProfileOutput } from '@/core/profile/types'
 
 import { NotFoundError } from '@/helpers/errors'
 import { dbInMemory as db } from './db'
 
-export const createArticleInDB = async (data: CreateArticle) => {
+import { CreateArticleInDB, DBArticle, DBUser } from '@/ports/adapters/db/types'
+
+type ReturnedDBArticle = DBArticle & {
+  author: DBUser
+}
+export const createArticleInDB: CreateArticleInDB<ReturnedDBArticle> = async (data) => {
   const id = uuidv4()
   const date = new Date().toISOString()
 
-  const author = getUserProfileFromDB(data.authorId)
+  const author = db.users[data.authorId]
 
-  const articleSlug = slugify(data.title, { lower: true })
+  if (!author) {
+    throw new NotFoundError('User does not exist')
+  }
 
-  db.articlesBySlug[articleSlug] = id
+  db.articlesBySlug[data.slug] = id
 
   const registeredArticle = db.articles[id] = {
     id,
-    slug: articleSlug,
+    slug: data.slug,
     title: data.title,
     description: data.description,
     body: data.body,
