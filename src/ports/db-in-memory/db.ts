@@ -1,10 +1,4 @@
-import { CommentOutput } from '@/core/comment/types'
-import { DBUser, DBArticle } from '@/ports/adapters/db/types'
-
-export type DBComment = Omit<CommentOutput, 'author'> & {
-  articleId: string
-  authorId: string
-}
+import { DBUser, DBArticle, DBComment } from '@/ports/adapters/db/types'
 
 type ArticleID = string
 type UserID = string

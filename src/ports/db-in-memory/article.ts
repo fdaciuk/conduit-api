@@ -1,25 +1,24 @@
 import { v4 as uuidv4 } from 'uuid'
 
-import { CreateComment } from '@/core/comment/types'
-import { ProfileOutput } from '@/core/profile/types'
-
 import { NotFoundError } from '@/helpers/errors'
 import { dbInMemory as db } from './db'
 
-import { CreateArticleInDB, DBArticle, DBUser } from '@/ports/adapters/db/types'
+import {
+  CreateArticleInDB,
+  AddCommentToAnArticleInDB,
+  DBArticle,
+  DBComment,
+  DBUser,
+} from '@/ports/adapters/db/types'
 
-type ReturnedDBArticle = DBArticle & {
+type ArticleReturned = DBArticle & {
   author: DBUser
 }
-export const createArticleInDB: CreateArticleInDB<ReturnedDBArticle> = async (data) => {
+export const createArticleInDB: CreateArticleInDB<ArticleReturned> = async (data) => {
   const id = uuidv4()
   const date = new Date().toISOString()
 
-  const author = db.users[data.authorId]
-
-  if (!author) {
-    throw new NotFoundError('User does not exist')
-  }
+  const author = getUserProfileFromDB(data.authorId)
 
   db.articlesBySlug[data.slug] = id
 
@@ -42,7 +41,11 @@ export const createArticleInDB: CreateArticleInDB<ReturnedDBArticle> = async (da
   }
 }
 
-export const addCommentToAnArticleInDB = async (data: CreateComment) => {
+type CommentReturned = DBComment & {
+  author: DBUser
+}
+
+export const addCommentToAnArticleInDB: AddCommentToAnArticleInDB<CommentReturned> = async (data) => {
   const date = new Date().toISOString()
   const id = Date.now()
   const articleId = db.articlesBySlug[data.articleSlug] || ''
@@ -63,17 +66,12 @@ export const addCommentToAnArticleInDB = async (data: CreateComment) => {
   return { ...comment, author }
 }
 
-function getUserProfileFromDB (userId: string): ProfileOutput {
+function getUserProfileFromDB (userId: string) {
   const user = db.users[userId]
 
   if (!user) {
     throw new NotFoundError('User does not exist')
   }
 
-  return {
-    username: user.username,
-    bio: user.bio ?? '',
-    image: user.image ?? '',
-    following: false,
-  }
+  return user
 }

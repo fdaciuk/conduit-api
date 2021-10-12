@@ -1,7 +1,7 @@
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import { CreateArticle, ArticleOutput } from '@/core/article/types'
-import { CreateComment, CommentOutput } from '@/core/comment/types'
+import { CreateComment } from '@/core/comment/types'
 import * as db from '@/ports/adapters/db'
 import * as article from '@/core/article/use-cases'
 
@@ -20,7 +20,6 @@ export function addCommentToAnArticle (data: CreateComment) {
   return pipe(
     data,
     article.addCommentToAnArticle(db.addCommentToAnArticleInDB),
-    TE.map(getAddCommentToAnArticleResponse),
     TE.mapLeft(getError),
   )
 }
@@ -37,15 +36,4 @@ const getArticleResponse = (article: GetArticleResponseInput) => {
       favorited: false,
     },
   }
-}
-
-type GetAddCommentToAnArticleInput = CommentOutput & {
-  authorId: string
-  articleId: string
-}
-
-const getAddCommentToAnArticleResponse = (registeredComment: GetAddCommentToAnArticleInput) => {
-  const { authorId, articleId, ...comment } = registeredComment
-
-  return { comment }
 }
