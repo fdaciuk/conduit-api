@@ -1,5 +1,8 @@
 'use strict'
 
+const { pathsToModuleNameMapper } = require('ts-jest/utils')
+const { compilerOptions } = require('./tsconfig.json')
+
 module.exports = {
   preset: 'ts-jest',
   globals: {
@@ -8,7 +11,8 @@ module.exports = {
     },
   },
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
-  moduleNameMapper: {
-    '@/(.*)': '<rootDir>/src/$1',
-  },
+  moduleNameMapper: pathsToModuleNameMapper(
+    compilerOptions.paths,
+    { prefix: '<rootDir>' },
+  ),
 }
