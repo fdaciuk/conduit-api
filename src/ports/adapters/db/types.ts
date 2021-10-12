@@ -4,7 +4,7 @@ import {
   UpdateUserOutput,
   LoginUser,
 } from '@/core/user/types'
-
+import { CommentOutput, CreateComment } from '@/core/comment/types'
 import { ArticleOutput, CreateArticleOutput } from '@/core/article/types'
 
 export type DBUser = Omit<UserOutput, 'token'> & {
@@ -16,6 +16,11 @@ export type DBUser = Omit<UserOutput, 'token'> & {
 
 export type DBArticle = Omit<ArticleOutput, 'favorited' | 'author'> & {
   id: string
+  authorId: string
+}
+
+export type DBComment = Omit<CommentOutput, 'author'> & {
+  articleId: string
   authorId: string
 }
 
@@ -58,5 +63,5 @@ type CreateArticleInput = CreateArticleOutput & {
   slug: string
 }
 
-export type CreateArticleInDB<T = DBArticle> = (data: CreateArticleInput) =>
-  Promise<T>
+export type CreateArticleInDB<T> = (data: CreateArticleInput) => Promise<T>
+export type AddCommentToAnArticleInDB<T> = (data: CreateComment) => Promise<T>

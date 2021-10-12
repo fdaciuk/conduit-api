@@ -1,8 +1,8 @@
-import { Article, User } from '@prisma/client'
-
-// import { CreateComment } from '@/core/comment/types'
-// import { ProfileOutput } from '@/core/profile/types'
-import { CreateArticleInDB } from '@/ports/adapters/db/types'
+import { Article, Comment, User } from '@prisma/client'
+import {
+  CreateArticleInDB,
+  AddCommentToAnArticleInDB,
+} from '@/ports/adapters/db/types'
 
 import { ValidationError } from '@/helpers/errors'
 import { prisma } from '../prisma'
@@ -51,38 +51,31 @@ export const createArticleInDB: CreateArticleInDB<ArticleReturned> = async (data
   }
 }
 
-// export const addCommentToAnArticleInDB = async (data: CreateComment) => {
-//   const date = new Date().toISOString()
-//   const id = Date.now()
-//   const articleId = db.articlesBySlug[data.articleSlug] || ''
+type CommentReturned = Omit<Comment, 'createdAt' | 'updatedAt'> & {
+  createdAt: string
+  updatedAt: string
+  author: User
+}
 
-//   const author = getUserProfileFromDB(data.authorId)
+export const addCommentToAnArticleInDB: AddCommentToAnArticleInDB<CommentReturned> = async (data) => {
+  const comment = await prisma.comment.create({
+    data: {
+      body: data.body,
+      author: {
+        connect: { id: data.authorId },
+      },
+      article: {
+        connect: { slug: data.articleSlug },
+      },
+    },
+    include: {
+      author: true,
+    },
+  })
 
-//   const comment = {
-//     id,
-//     createdAt: date,
-//     updatedAt: date,
-//     body: data.body,
-//     articleId,
-//     authorId: data.authorId,
-//   }
-
-//   db.comments[articleId] = (db.comments[articleId] ?? []).concat(comment)
-
-//   return { ...comment, author }
-// }
-
-// function getUserProfileFromDB (userId: string): ProfileOutput {
-//   const user = db.users[userId]
-
-//   if (!user) {
-//     throw new NotFoundError('User does not exist')
-//   }
-
-//   return {
-//     username: user.username,
-//     bio: user.bio ?? '',
-//     image: user.image ?? '',
-//     following: false,
-//   }
-// }
+  return {
+    ...comment,
+    createdAt: comment.createdAt.toISOString(),
+    updatedAt: comment.updatedAt.toISOString(),
+  }
+}

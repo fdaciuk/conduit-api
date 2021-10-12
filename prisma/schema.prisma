@@ -18,6 +18,7 @@ model User {
   image          String?
   password       String
   articles       Article[]
+  comments       Comment[]
   whoIsFollowing Follower[] @relation("Follower")
   following      Follower[] @relation("Following")
   createdAt      DateTime   @default(now())
@@ -52,6 +53,18 @@ model Article {
   description String
   body        String
   tagList     Tag[]
+  comments    Comment[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  body      String
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id])
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

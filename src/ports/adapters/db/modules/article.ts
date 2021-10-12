@@ -1,5 +1,6 @@
 import slugify from 'slugify'
 import { CreateArticle } from '@/core/article/types'
+import { CreateComment, CommentOutput } from '@/core/comment/types'
 import { database as db } from '../db'
 import { DBArticle } from '../types'
 
@@ -24,4 +25,20 @@ export const createArticleInDB: CreateArticleInDB = async (data) => {
   }
 }
 
-export const addCommentToAnArticleInDB = db.addCommentToAnArticleInDB
+type AddCommentToAnArticleInDB = (data: CreateComment) => Promise<CommentOutput>
+export const addCommentToAnArticleInDB: AddCommentToAnArticleInDB = async (data) => {
+  const comment = await db.addCommentToAnArticleInDB(data)
+
+  return {
+    id: comment.id,
+    body: comment.body,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    author: {
+      username: comment.author.username,
+      bio: comment.author.bio ?? '',
+      image: comment.author.image ?? '',
+      following: false,
+    },
+  }
+}
