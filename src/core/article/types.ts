@@ -52,3 +52,4 @@ export const createArticleCodec = t.intersection([
 ])
 
 export type CreateArticle = t.TypeOf<typeof createArticleCodec>
+export type CreateArticleOutput = t.OutputOf<typeof createArticleCodec>

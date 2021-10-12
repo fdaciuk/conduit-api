@@ -5,11 +5,18 @@ import {
   LoginUser,
 } from '@/core/user/types'
 
+import { ArticleOutput, CreateArticleOutput } from '@/core/article/types'
+
 export type DBUser = Omit<UserOutput, 'token'> & {
   id: string
   password: string
   following?: { [id: string]: true }
   followers?: { [id: string]: true }
+}
+
+export type DBArticle = Omit<ArticleOutput, 'favorited' | 'author'> & {
+  id: string
+  authorId: string
 }
 
 type CreateUserData = CreateUserOutput & {
@@ -46,3 +53,10 @@ type UnfollowUserInput = {
 }
 
 export type UnfollowUser<T = DBUser> = (input: UnfollowUserInput) => Promise<T>
+
+type CreateArticleInput = CreateArticleOutput & {
+  slug: string
+}
+
+export type CreateArticleInDB<T = DBArticle> = (data: CreateArticleInput) =>
+  Promise<T>
