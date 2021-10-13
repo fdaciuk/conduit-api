@@ -33,6 +33,7 @@ yarn test:watch
 | `yarn docker:destroy`         | Destroy database and all docker data                          |
 | `yarn migrate <name>`         | Run Prisma migration (You must provide a name)                |
 | `yarn migration`              | Run existent Prisma migrations                                |
+| `yarn migration:prod`         | Run existent Prisma migrations on production                  |
 | `yarn test`                   | Run unit and integration tests once (great to be used in CI)  |
 | `yarn test:watch`             | Run unit tests in watch mode                                  |
 | `yarn test:integration`       | Run integration tests once                                    |
