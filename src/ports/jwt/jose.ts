@@ -10,7 +10,7 @@ if (JWT_SECRET.length < 32) {
 
 export async function createJWT (
   payload: JWTPayload,
-  expirationTime: string = '10m',
+  expirationTime: string = '1h',
 ) {
   const secret = Buffer.from(JWT_SECRET)
   return new SignJWT(payload)
