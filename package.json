@@ -1,6 +1,6 @@
 {
   "name": "conduit-api",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "main": "index.js",
   "repository": "git@github.com:fdaciuk/conduit-api.git",
   "author": "Fernando Daciuk - @fdaciuk",
