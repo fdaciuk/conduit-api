@@ -15,6 +15,7 @@
     "docker:destroy": "docker-compose down --volumes --remove-orphans",
     "migrate": "prisma migrate dev --name",
     "migration": "prisma migrate dev",
+    "migration:prod": "prisma migrate deploy",
     "test": "jest --passWithNoTests && yarn test:integration",
     "test:watch": "jest --watch",
     "test:integration": "jest --passWithNoTests --config jest.config.integration.js",
