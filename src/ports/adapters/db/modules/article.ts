@@ -1,6 +1,7 @@
 import slugify from 'slugify'
 import { CreateArticle } from '@/core/article/types'
 import { CreateComment, CommentOutput } from '@/core/comment/types'
+import { ArticlesFilter } from '@/ports/adapters/http/types'
 import { database as db } from '../db'
 import { DBArticle } from '../types'
 
@@ -25,8 +26,9 @@ export const createArticleInDB: CreateArticleInDB = async (data) => {
   }
 }
 
-export const getArticlesFromDB = async () => {
-  const articles = await db.getArticlesFromDB()
+export const getArticlesFromDB = async (filter: ArticlesFilter) => {
+  const articles = await db.getArticlesFromDB(filter)
+
   return articles.map(article => ({
     ...article,
     author: {
