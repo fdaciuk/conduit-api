@@ -3,6 +3,7 @@ import {
   CreateArticleInDB,
   AddCommentToAnArticleInDB,
 } from '@/ports/adapters/db/types'
+import { ArticlesFilter } from '@/ports/adapters/http/types'
 
 import { ValidationError } from '@/helpers/errors'
 import { prisma } from '../prisma'
@@ -51,10 +52,30 @@ export const createArticleInDB: CreateArticleInDB<ArticleReturned> = async (data
   }
 }
 
-export const getArticlesFromDB = async () => {
+export const getArticlesFromDB = async (filter?: ArticlesFilter) => {
   const articles = await prisma.article.findMany({
+    take: Number(filter?.limit ?? 20),
+    skip: Number(filter?.offset ?? 0),
+
     orderBy: {
       createdAt: 'desc',
+    },
+    where: {
+      AND: [
+        {
+          author: {
+            username: filter?.author,
+          },
+        },
+
+        {
+          tagList: {
+            some: {
+              name: filter?.tag,
+            },
+          },
+        },
+      ],
     },
     include: {
       author: true,
