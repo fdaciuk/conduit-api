@@ -31,6 +31,21 @@ export function fetchArticles (filter: ArticlesFilter) {
   )
 }
 
+type FavoriteArticleInput = {
+  slug: string
+  userId: string
+}
+
+export function favoriteArticle (data: FavoriteArticleInput) {
+  return pipe(
+    TE.tryCatch(
+      () => db.favoriteArticleInDB(data),
+      E.toError,
+    ),
+    TE.mapLeft(getError),
+  )
+}
+
 function getArticlesResponse (articles: DBArticle[]) {
   return {
     articles,

@@ -11,18 +11,19 @@ generator client {
 }
 
 model User {
-  id             String     @id @default(uuid())
-  email          String     @unique
-  username       String     @unique
-  bio            String?
-  image          String?
-  password       String
-  articles       Article[]
-  comments       Comment[]
-  whoIsFollowing Follower[] @relation("Follower")
-  following      Follower[] @relation("Following")
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  id                String     @id @default(uuid())
+  email             String     @unique
+  username          String     @unique
+  bio               String?
+  image             String?
+  password          String
+  articles          Article[]
+  comments          Comment[]
+  whoIsFollowing    Follower[] @relation("Follower")
+  following         Follower[] @relation("Following")
+  favoritedArticles Favorite[]
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 
   @@index([email, username])
 }
@@ -54,8 +55,18 @@ model Article {
   body        String
   tagList     Tag[]
   comments    Comment[]
+  favoritedArticles Favorite[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Favorite {
+  userId    String
+  articleId String
+  article   Article @relation(fields: [articleId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@id([userId, articleId])
 }
 
 model Comment {

@@ -1,5 +1,5 @@
 import slugify from 'slugify'
-import { CreateArticle } from '@/core/article/types'
+import { CreateArticle, ArticleOutput } from '@/core/article/types'
 import { CreateComment, CommentOutput } from '@/core/comment/types'
 import { ArticlesFilter } from '@/ports/adapters/http/types'
 import { database as db } from '../db'
@@ -38,6 +38,26 @@ export const getArticlesFromDB = async (filter: ArticlesFilter) => {
       following: false,
     },
   }))
+}
+
+type FavoriteArticleInput = {
+  slug: string
+  userId: string
+}
+
+type FavoriteArticleInDB = (data: FavoriteArticleInput) => Promise<ArticleOutput>
+export const favoriteArticleInDB: FavoriteArticleInDB = async (data) => {
+  const article = await db.favoriteArticleInDB(data)
+
+  return {
+    ...article,
+    author: {
+      username: article.author.username,
+      bio: article.author.bio ?? '',
+      image: article.author.image ?? '',
+      following: false,
+    },
+  }
 }
 
 type AddCommentToAnArticleInDB = (data: CreateComment) => Promise<CommentOutput>
