@@ -43,6 +43,25 @@ app.get<GetArticlesApi>('/api/articles', (req, reply) => {
   )()
 })
 
+type FavoriteArticleApi = {
+  Params: {
+    slug: Slug
+  }
+}
+
+app.post<FavoriteArticleApi>('/api/articles/:slug/favorite', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
+  pipe(
+    article.favoriteArticle({
+      userId: payload.id,
+      slug: req.params.slug,
+    }),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
 type AddCommentApi = {
   Body: {
     comment: CreateComment
