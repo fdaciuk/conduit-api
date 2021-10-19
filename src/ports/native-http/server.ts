@@ -1,4 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http'
+import { getError } from '@/ports/adapters/http/http'
 
 export type RequestListener = (request: IncomingMessage, response: ServerResponse) => Promise<void>;
 export type Routes = {
@@ -15,11 +16,12 @@ const routes: Routes = {
   },
 }
 
-const errorHandler = (response: ServerResponse) => {
-  return (error: unknown) => {
+type ErrorHandler = (response: ServerResponse) => (error: Error) => void
+const errorHandler: ErrorHandler = (response) => {
+  return (error) => {
     console.error(error)
     response.writeHead(500, DEFAULT_HEADER)
-    response.write(JSON.stringify({ error: 'Internal Server Error' }))
+    response.write(JSON.stringify(getError(error)))
     response.end()
   }
 }
