@@ -46,6 +46,16 @@ export function favoriteArticle (data: FavoriteArticleInput) {
   )
 }
 
+export function unfavoriteArticle (data: FavoriteArticleInput) {
+  return pipe(
+    TE.tryCatch(
+      () => db.unfavoriteArticleInDB(data),
+      E.toError,
+    ),
+    TE.mapLeft(getError),
+  )
+}
+
 function getArticlesResponse (articles: DBArticle[]) {
   return {
     articles,

@@ -106,7 +106,7 @@ export const favoriteArticleInDB = async (data: FavoriteArticleInput) => {
   })
 
   if (!article) {
-    throw new NotFoundError(`Article ${data.slug}does not exist`)
+    throw new NotFoundError(`Article ${data.slug} does not exist`)
   }
 
   try {
@@ -133,8 +133,40 @@ export const favoriteArticleInDB = async (data: FavoriteArticleInput) => {
       createdAt: favoritedArticle.article.createdAt.toISOString(),
       updatedAt: favoritedArticle.article.updatedAt.toISOString(),
     }
-  } catch (e) {
+  } catch (error) {
+    if (error.message.includes('Unique constraint failed on the fields: (`userId`,`articleId`)')) {
+      throw new ValidationError(`The article ${data.slug} is already a favorite`)
+    }
+
     throw new ValidationError(`Error trying to favorite article ${data.slug}`)
+  }
+}
+
+export const unfavoriteArticleInDB = async (data: FavoriteArticleInput) => {
+  const article = await prisma.article.update({
+    where: {
+      slug: data.slug,
+    },
+    data: {
+      favoritedArticles: {
+        deleteMany: {
+          userId: data.userId,
+        },
+      },
+    },
+    include: {
+      author: true,
+      tagList: true,
+    },
+  })
+
+  return {
+    ...article,
+    favorited: false,
+    favoritesCount: 0, // TODO: Mock
+    tagList: article.tagList.map(({ name }) => name),
+    createdAt: article.createdAt.toISOString(),
+    updatedAt: article.updatedAt.toISOString(),
   }
 }
 
