@@ -1,5 +1,5 @@
 import slugify from 'slugify'
-import { CreateArticle, ArticleOutput } from '@/core/article/types'
+import { CreateArticle } from '@/core/article/types'
 import { CreateComment, CommentOutput } from '@/core/comment/types'
 import { ArticlesFilter } from '@/ports/adapters/http/types'
 import { database as db } from '../db'
@@ -45,7 +45,7 @@ type FavoriteArticleInput = {
   userId: string
 }
 
-type FavoriteArticleInDB = (data: FavoriteArticleInput) => Promise<ArticleOutput>
+type FavoriteArticleInDB = (data: FavoriteArticleInput) => Promise<DBArticle>
 export const favoriteArticleInDB: FavoriteArticleInDB = async (data) => {
   const article = await db.favoriteArticleInDB(data)
 

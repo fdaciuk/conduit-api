@@ -42,6 +42,7 @@ export function favoriteArticle (data: FavoriteArticleInput) {
       () => db.favoriteArticleInDB(data),
       E.toError,
     ),
+    TE.map(getArticleResponse),
     TE.mapLeft(getError),
   )
 }
@@ -52,6 +53,7 @@ export function unfavoriteArticle (data: FavoriteArticleInput) {
       () => db.unfavoriteArticleInDB(data),
       E.toError,
     ),
+    TE.map(getArticleResponse),
     TE.mapLeft(getError),
   )
 }

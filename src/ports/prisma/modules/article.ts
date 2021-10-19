@@ -5,7 +5,7 @@ import {
 } from '@/ports/adapters/db/types'
 import { ArticlesFilter } from '@/ports/adapters/http/types'
 
-import { ValidationError, NotFoundError } from '@/helpers/errors'
+import { ValidationError } from '@/helpers/errors'
 import { prisma } from '../prisma'
 
 type ArticleReturned = Omit<Article, 'createdAt' | 'updatedAt'> & {
@@ -99,39 +99,31 @@ type FavoriteArticleInput = {
 }
 
 export const favoriteArticleInDB = async (data: FavoriteArticleInput) => {
-  const article = await prisma.article.findUnique({
-    where: {
-      slug: data.slug,
-    },
-  })
-
-  if (!article) {
-    throw new NotFoundError(`Article ${data.slug} does not exist`)
-  }
-
   try {
-    const favoritedArticle = await prisma.favorite.create({
-      data: {
-        userId: data.userId,
-        articleId: article.id,
+    const article = await prisma.article.update({
+      where: {
+        slug: data.slug,
       },
-      include: {
-        article: {
-          include: {
-            author: true,
-            tagList: true,
+      data: {
+        favoritedArticles: {
+          create: {
+            userId: data.userId,
           },
         },
+      },
+      include: {
+        author: true,
+        tagList: true,
       },
     })
 
     return {
-      ...favoritedArticle.article,
+      ...article,
       favorited: true,
       favoritesCount: 0, // TODO: Mock
-      tagList: favoritedArticle.article.tagList.map(({ name }) => name),
-      createdAt: favoritedArticle.article.createdAt.toISOString(),
-      updatedAt: favoritedArticle.article.updatedAt.toISOString(),
+      tagList: article.tagList.map(({ name }) => name),
+      createdAt: article.createdAt.toISOString(),
+      updatedAt: article.updatedAt.toISOString(),
     }
   } catch (error) {
     if (error.message.includes('Unique constraint failed on the fields: (`userId`,`articleId`)')) {
