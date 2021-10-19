@@ -1,5 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { getError } from '@/ports/adapters/http/http'
+import { userRoutes } from './modules'
 
 export type RequestListener = (request: IncomingMessage, response: ServerResponse) => Promise<void>;
 export type Routes = {
@@ -9,6 +10,7 @@ export type Routes = {
 export const DEFAULT_HEADER = { 'Content-Type': 'application/json' }
 
 const routes: Routes = {
+  ...userRoutes,
   '/not-found': async (_request, response) => {
     response.writeHead(404, DEFAULT_HEADER)
     response.write(JSON.stringify({ error: 'Route not found.' }))
@@ -24,6 +26,13 @@ const errorHandler: ErrorHandler = (response) => {
     response.write(JSON.stringify(getError(error)))
     response.end()
   }
+}
+
+type HttpResponse = (response: ServerResponse, data: Record<string, any>, status?: number) => void
+export const httpResponse: HttpResponse = (response, data, status = 200) => {
+  response.writeHead(status, DEFAULT_HEADER)
+  response.write(JSON.stringify(data))
+  return response.end()
 }
 
 export const app: RequestListener = (request, response) => {
