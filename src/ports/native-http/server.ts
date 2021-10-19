@@ -24,7 +24,7 @@ const errorHandler: ErrorHandler = (response) => {
     console.error(error)
     response.writeHead(500, DEFAULT_HEADER)
     response.write(JSON.stringify(getError(error)))
-    response.end()
+    return response.end()
   }
 }
 
@@ -38,8 +38,8 @@ export const httpResponse: HttpResponse = (response, data, status = 200) => {
 export const app: RequestListener = (request, response) => {
   const { url, method } = request
 
-  const [, apiPrefix, route] = url!.split('/')
-  const key = `${method} /${apiPrefix}/${route}`
+  const [, apiPrefix, ...route] = url!.split('/')
+  const key = `${method} /${apiPrefix}/${route.join('/')}`
 
   response.writeHead(200, DEFAULT_HEADER)
 
