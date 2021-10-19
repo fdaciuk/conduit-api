@@ -34,6 +34,18 @@ const userRoutes: Routes = {
       )()
     }
   },
+
+  'POST /api/users/login': async (request, response) => {
+    for await (const body of request) {
+      pipe(
+        body,
+        getUserFromRequestBody,
+        user.login,
+        TE.map(result => httpResponse(response, result)),
+        TE.mapLeft(result => httpResponse(response, result.error, result.code)),
+      )()
+    }
+  },
 }
 
 export { userRoutes }
