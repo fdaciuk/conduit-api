@@ -62,6 +62,19 @@ app.post<FavoriteArticleApi>('/api/articles/:slug/favorite', authOptions, (req, 
   )()
 })
 
+app.delete<FavoriteArticleApi>('/api/articles/:slug/favorite', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
+  pipe(
+    article.unfavoriteArticle({
+      userId: payload.id,
+      slug: req.params.slug,
+    }),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
 type AddCommentApi = {
   Body: {
     comment: CreateComment

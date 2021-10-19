@@ -60,6 +60,20 @@ export const favoriteArticleInDB: FavoriteArticleInDB = async (data) => {
   }
 }
 
+export const unfavoriteArticleInDB: FavoriteArticleInDB = async (data) => {
+  const article = await db.unfavoriteArticleInDB(data)
+
+  return {
+    ...article,
+    author: {
+      username: article.author.username,
+      bio: article.author.bio ?? '',
+      image: article.author.image ?? '',
+      following: false,
+    },
+  }
+}
+
 type AddCommentToAnArticleInDB = (data: CreateComment) => Promise<CommentOutput>
 export const addCommentToAnArticleInDB: AddCommentToAnArticleInDB = async (data) => {
   const comment = await db.addCommentToAnArticleInDB(data)
