@@ -20,10 +20,14 @@ export function registerArticle (data: CreateArticle) {
   )
 }
 
-export function fetchArticles (filter: ArticlesFilter) {
+type FetchArticlesInput = {
+  filter: ArticlesFilter
+  userId: string
+}
+export function fetchArticles ({ filter, userId }: FetchArticlesInput) {
   return pipe(
     TE.tryCatch(
-      () => db.getArticlesFromDB(filter),
+      () => db.getArticlesFromDB({ filter, userId }),
       E.toError,
     ),
     TE.map(getArticlesResponse),
@@ -81,10 +85,7 @@ type GetArticleResponseInput = Omit<ArticleOutput, 'favorited'> & {
 const getArticleResponse = (article: GetArticleResponseInput) => {
   const { authorId, ...articleResponse } = article
   return {
-    article: {
-      ...articleResponse,
-      favorited: false,
-    },
+    article: articleResponse,
   }
 }
 
