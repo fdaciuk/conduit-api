@@ -7,7 +7,7 @@ import { getPayload } from '@/ports/adapters/http/http'
 import { ArticlesFilter } from '@/ports/adapters/http/types'
 import * as article from '@/ports/adapters/http/modules/article'
 
-import { app, authOptions } from '@/ports/fastify/server'
+import { app, authOptions, tryAuthOptions } from '@/ports/fastify/server'
 
 type CreateArticleApi = {
   Body: {
@@ -35,9 +35,14 @@ type GetArticlesApi = {
   Querystring: ArticlesFilter
 }
 
-app.get<GetArticlesApi>('/api/articles', (req, reply) => {
+app.get<GetArticlesApi>('/api/articles', tryAuthOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
   pipe(
-    article.fetchArticles(req.query),
+    article.fetchArticles({
+      filter: req.query,
+      userId: payload.id,
+    }),
     TE.map(result => reply.send(result)),
     TE.mapLeft(result => reply.code(result.code).send(result.error)),
   )()

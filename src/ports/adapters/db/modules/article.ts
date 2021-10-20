@@ -26,8 +26,13 @@ export const createArticleInDB: CreateArticleInDB = async (data) => {
   }
 }
 
-export const getArticlesFromDB = async (filter: ArticlesFilter) => {
-  const articles = await db.getArticlesFromDB(filter)
+type GetArticlesFromDBInput = {
+  filter: ArticlesFilter
+  userId: string
+}
+
+export const getArticlesFromDB = async ({ filter, userId }: GetArticlesFromDBInput) => {
+  const articles = await db.getArticlesFromDB({ filter, userId })
 
   return articles.map(article => ({
     ...article,
