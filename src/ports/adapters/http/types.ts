@@ -5,3 +5,8 @@ export type ArticlesFilter = {
   limit?: number
   offset?: number
 }
+
+export type FavoriteArticleInput = {
+  slug: string
+  userId: string
+}

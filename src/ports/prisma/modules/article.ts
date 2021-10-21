@@ -3,7 +3,10 @@ import {
   CreateArticleInDB,
   AddCommentToAnArticleInDB,
 } from '@/ports/adapters/db/types'
-import { ArticlesFilter } from '@/ports/adapters/http/types'
+import {
+  ArticlesFilter,
+  FavoriteArticleInput,
+} from '@/ports/adapters/http/types'
 
 import { ValidationError } from '@/helpers/errors'
 import { prisma } from '../prisma'
@@ -110,11 +113,6 @@ export const getArticlesFromDB = async ({ filter, userId }: GetArticlesFromDBInp
       updatedAt: article.updatedAt.toISOString(),
     }
   })
-}
-
-type FavoriteArticleInput = {
-  slug: string
-  userId: string
 }
 
 export const favoriteArticleInDB = async (data: FavoriteArticleInput) => {

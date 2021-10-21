@@ -9,7 +9,7 @@ import * as article from '@/core/article/use-cases'
 import { getError } from '@/ports/adapters/http/http'
 import { DBArticle } from '@/ports/adapters/db/types'
 
-import { ArticlesFilter } from '../types'
+import { ArticlesFilter, FavoriteArticleInput } from '../types'
 
 export function registerArticle (data: CreateArticle) {
   return pipe(
@@ -24,6 +24,7 @@ type FetchArticlesInput = {
   filter: ArticlesFilter
   userId: string
 }
+
 export function fetchArticles ({ filter, userId }: FetchArticlesInput) {
   return pipe(
     TE.tryCatch(
@@ -33,11 +34,6 @@ export function fetchArticles ({ filter, userId }: FetchArticlesInput) {
     TE.map(getArticlesResponse),
     TE.mapLeft(getError),
   )
-}
-
-type FavoriteArticleInput = {
-  slug: string
-  userId: string
 }
 
 export function favoriteArticle (data: FavoriteArticleInput) {

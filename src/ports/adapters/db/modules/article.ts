@@ -1,7 +1,10 @@
 import slugify from 'slugify'
 import { CreateArticle } from '@/core/article/types'
 import { CreateComment, CommentOutput } from '@/core/comment/types'
-import { ArticlesFilter } from '@/ports/adapters/http/types'
+import {
+  ArticlesFilter,
+  FavoriteArticleInput,
+} from '@/ports/adapters/http/types'
 import { database as db } from '../db'
 import { DBArticle } from '../types'
 
@@ -31,7 +34,8 @@ type GetArticlesFromDBInput = {
   userId: string
 }
 
-export const getArticlesFromDB = async ({ filter, userId }: GetArticlesFromDBInput) => {
+type GetArticlesFromDB = (input: GetArticlesFromDBInput) => Promise<DBArticle[]>
+export const getArticlesFromDB: GetArticlesFromDB = async ({ filter, userId }) => {
   const articles = await db.getArticlesFromDB({ filter, userId })
 
   return articles.map(article => ({
@@ -43,11 +47,6 @@ export const getArticlesFromDB = async ({ filter, userId }: GetArticlesFromDBInp
       following: false,
     },
   }))
-}
-
-type FavoriteArticleInput = {
-  slug: string
-  userId: string
 }
 
 type FavoriteArticleInDB = (data: FavoriteArticleInput) => Promise<DBArticle>
