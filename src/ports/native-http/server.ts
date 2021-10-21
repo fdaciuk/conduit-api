@@ -2,7 +2,13 @@ import { IncomingMessage, ServerResponse } from 'http'
 import { getError } from '@/ports/adapters/http/http'
 import { userRoutes } from './modules'
 
-export type RequestListener = (request: IncomingMessage, response: ServerResponse) => Promise<void>;
+import { JWTPayload } from '@/ports/adapters/jwt'
+
+export type IncomingRequest = IncomingMessage & {
+  auth?: JWTPayload
+}
+
+export type RequestListener = (request: IncomingRequest, response: ServerResponse) => Promise<void>;
 export type Routes = {
   [key: string]: RequestListener
 }
