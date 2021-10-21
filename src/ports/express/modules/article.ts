@@ -36,6 +36,34 @@ articleRoutes.get('/api/articles', tryAuth, (req: Request, response: Response) =
   )()
 })
 
+articleRoutes.post('/api/articles/:slug/favorite', auth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+  const slugProp = 'slug'
+
+  pipe(
+    article.favoriteArticle({
+      userId: payload.id,
+      slug: req.params[slugProp] ?? '',
+    }),
+    TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
+articleRoutes.delete('/api/articles/:slug/favorite', auth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+  const slugProp = 'slug'
+
+  pipe(
+    article.unfavoriteArticle({
+      userId: payload.id,
+      slug: req.params[slugProp] ?? '',
+    }),
+    TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
 articleRoutes.post('/api/articles/:slug/comments', auth, async (req: Request, res: Response) => {
   const payload = getPayload(req.auth)
   const slugProp = 'slug'
