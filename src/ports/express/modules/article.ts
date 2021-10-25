@@ -23,7 +23,7 @@ articleRoutes.post('/api/articles', auth, async (req: Request, res: Response) =>
   )()
 })
 
-articleRoutes.get('/api/articles', tryAuth, (req: Request, response: Response) => {
+articleRoutes.get('/api/articles', tryAuth, (req: Request, res: Response) => {
   const payload = getPayload(req.auth)
 
   pipe(
@@ -31,8 +31,21 @@ articleRoutes.get('/api/articles', tryAuth, (req: Request, response: Response) =
       filter: req.query,
       userId: payload.id,
     }),
-    TE.map(result => response.json(result)),
-    TE.mapLeft(result => response.status(result.code).json(result.error)),
+    TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
+articleRoutes.get('/api/articles/feed', auth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+
+  pipe(
+    article.fetchArticlesFeed({
+      filter: req.query,
+      userId: payload.id,
+    }),
+    TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
   )()
 })
 
