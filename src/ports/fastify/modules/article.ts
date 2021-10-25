@@ -4,7 +4,10 @@ import { Slug } from '@/core/types/slug'
 import { CreateArticle } from '@/core/article/types'
 import { CreateComment } from '@/core/comment/types'
 import { getPayload } from '@/ports/adapters/http/http'
-import { ArticlesFilter } from '@/ports/adapters/http/types'
+import {
+  ArticlesFilter,
+  PaginationFilter,
+} from '@/ports/adapters/http/types'
 import * as article from '@/ports/adapters/http/modules/article'
 
 import { app, authOptions, tryAuthOptions } from '@/ports/fastify/server'
@@ -40,6 +43,23 @@ app.get<GetArticlesApi>('/api/articles', tryAuthOptions, (req, reply) => {
 
   pipe(
     article.fetchArticles({
+      filter: req.query,
+      userId: payload.id,
+    }),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
+type FeedArticlesApi = {
+  Querystring: PaginationFilter
+}
+
+app.get<FeedArticlesApi>('/api/articles/feed', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
+  pipe(
+    article.fetchArticlesFeed({
       filter: req.query,
       userId: payload.id,
     }),
