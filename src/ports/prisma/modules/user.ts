@@ -12,6 +12,7 @@ import {
   ValidationError,
   NotFoundError,
   ForbiddenError,
+  UnknownError,
 } from '@/helpers/errors'
 import { prisma } from '../prisma'
 
@@ -56,6 +57,10 @@ export const updateUserInDB: UpdateUserInDB<User> = (id) => async (data) => {
 
     return user
   } catch (e) {
+    if (!(e instanceof Error)) {
+      throw new UnknownError()
+    }
+
     if (e.message.includes('constraint failed on the fields: (`email`)')) {
       throw new ValidationError('This email is already in use')
     }

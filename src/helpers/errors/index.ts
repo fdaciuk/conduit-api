@@ -37,3 +37,9 @@ export class ValidationError extends DefaultError {
     super({ name: 'ValidationError', code: 422, message })
   }
 }
+
+export class UnknownError extends DefaultError {
+  constructor () {
+    super({ name: 'UnknownError', code: 418, message: 'Unknown error' })
+  }
+}

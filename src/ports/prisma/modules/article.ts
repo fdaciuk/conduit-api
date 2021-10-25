@@ -8,7 +8,7 @@ import {
   FavoriteArticleInput,
 } from '@/ports/adapters/http/types'
 
-import { ValidationError } from '@/helpers/errors'
+import { ValidationError, UnknownError } from '@/helpers/errors'
 import { prisma } from '../prisma'
 
 type ArticleReturned = Omit<Article, 'createdAt' | 'updatedAt'> & {
@@ -178,6 +178,10 @@ export const favoriteArticleInDB = async (data: FavoriteArticleInput) => {
       updatedAt: article.updatedAt.toISOString(),
     }
   } catch (error) {
+    if (!(error instanceof Error)) {
+      throw new UnknownError()
+    }
+
     if (error.message.includes('Unique constraint failed on the fields: (`userId`,`articleId`)')) {
       throw new ValidationError(`The article ${data.slug} is already a favorite`)
     }
