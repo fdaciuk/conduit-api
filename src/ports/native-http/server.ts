@@ -15,7 +15,7 @@ export type Routes = {
 
 export const DEFAULT_HEADER = { 'Content-Type': 'application/json' }
 
-const routes: Routes = {
+const routes: Routes & { '/not-found': RequestListener } = {
   ...userRoutes,
   '/not-found': async (_request, response) => {
     response.writeHead(404, DEFAULT_HEADER)
@@ -47,8 +47,6 @@ export const app: RequestListener = (request, response) => {
   const [, apiPrefix, ...route] = url!.split('/')
   const key = `${method} /${apiPrefix}/${route.join('/')}`
 
-  response.writeHead(200, DEFAULT_HEADER)
-
-  const routeHandler = routes[key] || routes['/not-found']
-  return routeHandler!(request, response).catch(errorHandler(response))
+  const routeHandler = routes[key] ?? routes['/not-found']
+  return routeHandler(request, response).catch(errorHandler(response))
 }
