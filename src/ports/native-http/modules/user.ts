@@ -9,18 +9,16 @@ import { withAuth } from '../middlewares'
 
 type GetUserFromRequestBody = (data: string) => CreateUser
 const getUserFromRequestBody: GetUserFromRequestBody = (data) => {
-  const { user } = pipe(
+  return pipe(
     E.tryCatch(
       () => JSON.parse(data),
       E.toError,
     ),
     E.fold(
       (error) => error,
-      (user) => user,
+      (body) => body.user || {},
     ),
   )
-
-  return user || {}
 }
 
 const userRoutes: Routes = {
