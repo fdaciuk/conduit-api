@@ -3,10 +3,10 @@ import * as TE from 'fp-ts/TaskEither'
 import * as user from '@/ports/adapters/http/modules/user'
 import { getPayload } from '@/ports/adapters/http/http'
 import { Routes, httpResponse } from '../server'
-import { withAuth } from '../middlewares'
+import { withAuth, withTryAuth } from '../middlewares'
 
 const profileRoutes: Routes = {
-  'GET /api/profiles/:username': async (request, response) => {
+  'GET /api/profiles/:username': withTryAuth(async (request, response) => {
     const username = 'username'
     const payload = getPayload(request.auth)
 
@@ -18,7 +18,7 @@ const profileRoutes: Routes = {
       TE.map(result => httpResponse(response, result)),
       TE.mapLeft(result => httpResponse(response, result.error, result.code)),
     )()
-  },
+  }),
 
   'POST /api/profiles/:username/follow': withAuth(async (request, response) => {
     const username = 'username'
