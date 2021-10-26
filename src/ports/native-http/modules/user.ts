@@ -24,7 +24,7 @@ const getUserFromRequestBody: GetUserFromRequestBody = (data) => {
 }
 
 const userRoutes: Routes = {
-  'GET /api/users': withAuth(async (request, response) => {
+  'GET /api/user': withAuth(async (request, response) => {
     const payload = getPayload(request.auth)
 
     pipe(
