@@ -4,10 +4,13 @@ import { Slug } from '@/core/types/slug'
 import { CreateArticle } from '@/core/article/types'
 import { CreateComment } from '@/core/comment/types'
 import { getPayload } from '@/ports/adapters/http/http'
-import { ArticlesFilter } from '@/ports/adapters/http/types'
+import {
+  ArticlesFilter,
+  PaginationFilter,
+} from '@/ports/adapters/http/types'
 import * as article from '@/ports/adapters/http/modules/article'
 
-import { app, authOptions } from '@/ports/fastify/server'
+import { app, authOptions, tryAuthOptions } from '@/ports/fastify/server'
 
 type CreateArticleApi = {
   Body: {
@@ -35,9 +38,63 @@ type GetArticlesApi = {
   Querystring: ArticlesFilter
 }
 
-app.get<GetArticlesApi>('/api/articles', (req, reply) => {
+app.get<GetArticlesApi>('/api/articles', tryAuthOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
   pipe(
-    article.fetchArticles(req.query),
+    article.fetchArticles({
+      filter: req.query,
+      userId: payload.id,
+    }),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
+type FeedArticlesApi = {
+  Querystring: PaginationFilter
+}
+
+app.get<FeedArticlesApi>('/api/articles/feed', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
+  pipe(
+    article.fetchArticlesFeed({
+      filter: req.query,
+      userId: payload.id,
+    }),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
+type FavoriteArticleApi = {
+  Params: {
+    slug: Slug
+  }
+}
+
+app.post<FavoriteArticleApi>('/api/articles/:slug/favorite', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
+  pipe(
+    article.favoriteArticle({
+      userId: payload.id,
+      slug: req.params.slug,
+    }),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
+app.delete<FavoriteArticleApi>('/api/articles/:slug/favorite', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
+  pipe(
+    article.unfavoriteArticle({
+      userId: payload.id,
+      slug: req.params.slug,
+    }),
     TE.map(result => reply.send(result)),
     TE.mapLeft(result => reply.code(result.code).send(result.error)),
   )()
@@ -65,6 +122,14 @@ app.post<AddCommentApi>('/api/articles/:slug/comments', authOptions, (req, reply
   pipe(
     data,
     article.addCommentToAnArticle,
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
+app.get('/api/tags', (_req, reply) => {
+  pipe(
+    article.getTags(),
     TE.map(result => reply.send(result)),
     TE.mapLeft(result => reply.code(result.code).send(result.error)),
   )()

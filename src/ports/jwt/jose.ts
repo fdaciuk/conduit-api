@@ -1,5 +1,4 @@
-import { SignJWT, JWTPayload } from 'jose/jwt/sign'
-import { jwtVerify } from 'jose/jwt/verify'
+import { SignJWT, JWTPayload, jwtVerify } from 'jose'
 import { env } from '@/helpers/env'
 
 const JWT_SECRET = env('JWT_SECRET')

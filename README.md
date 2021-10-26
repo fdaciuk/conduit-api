@@ -35,6 +35,7 @@ yarn test:watch
 | `yarn migration`              | Run existent Prisma migrations                                |
 | `yarn migration:prod`         | Run existent Prisma migrations on production                  |
 | `yarn test`                   | Run unit and integration tests once (great to be used in CI)  |
+| `yarn test:unit`              | Run unit tests once                                           |
 | `yarn test:watch`             | Run unit tests in watch mode                                  |
 | `yarn test:integration`       | Run integration tests once                                    |
 | `yarn test:integration:watch` | Run integration tests in watch mode                           |
@@ -44,6 +45,7 @@ yarn test:watch
 | `yarn prepare`                | Not suposed to be manually used. It's just to configure husky |
 | `yarn build`                  | Generates production build                                    |
 | `yarn ci`                     | Run lint, typechecking and tests (meant to be used in a CI)   |
+| `yarn update-deps`            | Update both dependencies and devDependencies                  |
 
 ## Tree structure
 
