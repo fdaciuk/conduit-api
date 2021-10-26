@@ -60,6 +60,23 @@ const userRoutes: Routes = {
       )()
     }
   },
+
+  'PUT /api/user': withAuth(async (request, response) => {
+    const payload = getPayload(request.auth)
+
+    for await (const body of request) {
+      pipe(
+        body,
+        getUserFromRequestBody,
+        user.updateUser({
+          id: payload.id,
+          authHeader: request.headers.authorization,
+        }),
+        TE.map(result => httpResponse(response, result)),
+        TE.mapLeft(result => httpResponse(response, result.error, result.code)),
+      )()
+    }
+  }),
 }
 
 export { userRoutes }
