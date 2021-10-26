@@ -8,6 +8,7 @@ import {
   PaginationFilter,
   FavoriteArticleInput,
 } from '@/ports/adapters/http/types'
+import { TagOutput } from '@/core/tag/types'
 
 import { ValidationError, UnknownError } from '@/helpers/errors'
 import { prisma } from '../prisma'
@@ -316,4 +317,9 @@ export const addCommentToAnArticleInDB: AddCommentToAnArticleInDB<CommentReturne
     createdAt: comment.createdAt.toISOString(),
     updatedAt: comment.updatedAt.toISOString(),
   }
+}
+
+export const getTagsFromDB = async (): Promise<TagOutput[]> => {
+  const tags = await prisma.tag.findMany()
+  return tags.map(tag => tag.name)
 }

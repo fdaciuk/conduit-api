@@ -95,4 +95,12 @@ articleRoutes.post('/api/articles/:slug/comments', auth, async (req: Request, re
   )()
 })
 
+articleRoutes.get('/api/tags', (_req, res) => {
+  pipe(
+    article.getTags(),
+    TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
 export { articleRoutes }
