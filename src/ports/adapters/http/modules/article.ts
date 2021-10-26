@@ -3,6 +3,7 @@ import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
 import { CreateArticle, ArticleOutput } from '@/core/article/types'
 import { CreateComment, CommentOutput } from '@/core/comment/types'
+import { TagOutput } from '@/core/tag/types'
 import * as db from '@/ports/adapters/db'
 import * as article from '@/core/article/use-cases'
 
@@ -94,6 +95,17 @@ export function addCommentToAnArticle (data: CreateComment) {
   )
 }
 
+export function getTags () {
+  return pipe(
+    TE.tryCatch(
+      () => db.getTagsFromDB(),
+      E.toError,
+    ),
+    TE.map(getTagsResponse),
+    TE.mapLeft(getError),
+  )
+}
+
 type GetArticleResponseInput = Omit<ArticleOutput, 'favorited'> & {
   authorId: string
 }
@@ -108,5 +120,11 @@ const getArticleResponse = (article: GetArticleResponseInput) => {
 const getCommentResponse = (comment: CommentOutput) => {
   return {
     comment,
+  }
+}
+
+const getTagsResponse = (tags: TagOutput[]) => {
+  return {
+    tags,
   }
 }

@@ -126,3 +126,11 @@ app.post<AddCommentApi>('/api/articles/:slug/comments', authOptions, (req, reply
     TE.mapLeft(result => reply.code(result.code).send(result.error)),
   )()
 })
+
+app.get('/api/tags', (_req, reply) => {
+  pipe(
+    article.getTags(),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
