@@ -81,8 +81,16 @@ export const getArticlesFromDB = async ({ filter, userId }: GetArticlesFromDBInp
     },
 
     include: {
-      author: true,
       tagList: true,
+      author: {
+        include: {
+          whoIsFollowing: {
+            where: {
+              userId,
+            },
+          },
+        },
+      },
       favoritedArticles: {
         where: {
           userId,
@@ -100,6 +108,10 @@ export const getArticlesFromDB = async ({ filter, userId }: GetArticlesFromDBInp
     const { _count, favoritedArticles, ...rest } = article
     return {
       ...rest,
+      author: {
+        ...rest.author,
+        following: !!rest.author.whoIsFollowing.length,
+      },
       favorited: favoritedArticles.length > 0,
       favoritesCount: _count ? _count.favoritedArticles : 0,
       tagList: article.tagList.map(({ name }) => name),
@@ -222,7 +234,15 @@ export const favoriteArticleInDB = async (data: FavoriteArticleInput) => {
         },
       },
       include: {
-        author: true,
+        author: {
+          include: {
+            whoIsFollowing: {
+              where: {
+                userId: data.userId,
+              },
+            },
+          },
+        },
         tagList: true,
         _count: {
           select: {
@@ -236,6 +256,10 @@ export const favoriteArticleInDB = async (data: FavoriteArticleInput) => {
 
     return {
       ...article,
+      author: {
+        ...article.author,
+        following: !!article.author.whoIsFollowing.length,
+      },
       favorited: true,
       favoritesCount: _count ? _count.favoritedArticles : 0,
       tagList: article.tagList.map(({ name }) => name),
@@ -268,7 +292,15 @@ export const unfavoriteArticleInDB = async (data: FavoriteArticleInput) => {
       },
     },
     include: {
-      author: true,
+      author: {
+        include: {
+          whoIsFollowing: {
+            where: {
+              userId: data.userId,
+            },
+          },
+        },
+      },
       tagList: true,
       _count: {
         select: {
@@ -282,6 +314,10 @@ export const unfavoriteArticleInDB = async (data: FavoriteArticleInput) => {
 
   return {
     ...article,
+    author: {
+      ...article.author,
+      following: !!article.author.whoIsFollowing.length,
+    },
     favorited: false,
     favoritesCount: _count ? _count.favoritedArticles : 0,
     tagList: article.tagList.map(({ name }) => name),
