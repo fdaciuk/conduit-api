@@ -25,6 +25,22 @@ export function registerArticle (data: CreateArticle) {
   )
 }
 
+type FetchArticleInput = {
+  slug: string
+  userId: string
+}
+
+export function fetchArticle (data: FetchArticleInput) {
+  return pipe(
+    TE.tryCatch(
+      () => db.getArticleFromDB(data),
+      E.toError,
+    ),
+    TE.map(getArticleResponse),
+    TE.mapLeft(getError),
+  )
+}
+
 type FetchArticlesInput = {
   filter: ArticlesFilter
   userId: string

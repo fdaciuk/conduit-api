@@ -29,6 +29,26 @@ export const createArticleInDB: CreateArticleInDB = async (data) => {
   }
 }
 
+type FetchArticleInput = {
+  slug: string
+  userId: string
+}
+
+export const getArticleFromDB = async (data: FetchArticleInput) => {
+  const article = await db.getArticleFromDB(data)
+
+  return {
+    ...article,
+    favoritesCount: 0,
+    author: {
+      username: article.author.username,
+      bio: article.author.bio ?? '',
+      image: article.author.image ?? '',
+      following: article.author.following,
+    },
+  }
+}
+
 type GetArticlesFromDBInput = {
   filter: ArticlesFilter
   userId: string
