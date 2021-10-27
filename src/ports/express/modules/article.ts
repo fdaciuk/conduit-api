@@ -95,6 +95,23 @@ articleRoutes.post('/api/articles/:slug/comments', auth, async (req: Request, re
   )()
 })
 
+articleRoutes.get('/api/articles/:slug/comments', tryAuth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+  const propSlug = 'slug'
+
+  const data = {
+    slug: req.params[propSlug] ?? '',
+    userId: payload.id,
+  }
+
+  pipe(
+    data,
+    article.getCommentsFromAnArticle,
+    TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
 articleRoutes.get('/api/tags', (_req, res) => {
   pipe(
     article.getTags(),
