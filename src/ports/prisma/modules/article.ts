@@ -319,6 +319,48 @@ export const addCommentToAnArticleInDB: AddCommentToAnArticleInDB<CommentReturne
   }
 }
 
+type GetCommentsFromAnArticleInput = {
+  slug: string
+  userId: string
+}
+
+export const getCommentsFromAnArticleInDB = async (data: GetCommentsFromAnArticleInput) => {
+  const allComments = await prisma.article.findUnique({
+    where: {
+      slug: data.slug,
+    },
+    select: {
+      comments: {
+        include: {
+          author: {
+            include: {
+              whoIsFollowing: {
+                where: {
+                  userId: data.userId,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+
+  if (!allComments) {
+    return []
+  }
+
+  return allComments.comments.map(comment => ({
+    ...comment,
+    author: {
+      ...comment.author,
+      following: !!comment.author.whoIsFollowing.length,
+    },
+    createdAt: comment.createdAt.toISOString(),
+    updatedAt: comment.updatedAt.toISOString(),
+  }))
+}
+
 export const getTagsFromDB = async (): Promise<TagOutput[]> => {
   const tags = await prisma.tag.findMany()
   return tags.map(tag => tag.name)

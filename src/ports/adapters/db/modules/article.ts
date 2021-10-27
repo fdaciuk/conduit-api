@@ -111,4 +111,26 @@ export const addCommentToAnArticleInDB: AddCommentToAnArticleInDB = async (data)
   }
 }
 
+type GetCommentsFromAnArticleInput = {
+  slug: string
+  userId: string
+}
+
+export const getCommentsFromAnArticleInDB = async (data: GetCommentsFromAnArticleInput) => {
+  const comments = await db.getCommentsFromAnArticleInDB(data)
+
+  return comments.map(comment => ({
+    id: comment.id,
+    body: comment.body,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    author: {
+      username: comment.author.username,
+      bio: comment.author.bio ?? '',
+      image: comment.author.image ?? '',
+      following: comment.author.following,
+    },
+  }))
+}
+
 export const getTagsFromDB = db.getTagsFromDB
