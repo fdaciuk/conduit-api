@@ -34,6 +34,25 @@ app.post<CreateArticleApi>('/api/articles', authOptions, (req, reply) => {
   )()
 })
 
+type GetArticleApi = {
+  Params: {
+    slug: string
+  }
+}
+
+app.get<GetArticleApi>('/api/articles/:slug', tryAuthOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
+  pipe(
+    article.fetchArticle({
+      slug: req.params.slug,
+      userId: payload.id,
+    }),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
 type GetArticlesApi = {
   Querystring: ArticlesFilter
 }
