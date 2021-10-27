@@ -34,6 +34,25 @@ app.post<CreateArticleApi>('/api/articles', authOptions, (req, reply) => {
   )()
 })
 
+type GetArticleApi = {
+  Params: {
+    slug: string
+  }
+}
+
+app.get<GetArticleApi>('/api/articles/:slug', tryAuthOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
+  pipe(
+    article.fetchArticle({
+      slug: req.params.slug,
+      userId: payload.id,
+    }),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
 type GetArticlesApi = {
   Querystring: ArticlesFilter
 }
@@ -122,6 +141,28 @@ app.post<AddCommentApi>('/api/articles/:slug/comments', authOptions, (req, reply
   pipe(
     data,
     article.addCommentToAnArticle,
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
+type GetCommentsFromAnArticleApi = {
+  Params: {
+    slug: string
+  }
+}
+
+app.get<GetCommentsFromAnArticleApi>('/api/articles/:slug/comments', tryAuthOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
+  const data = {
+    slug: req.params.slug,
+    userId: payload.id,
+  }
+
+  pipe(
+    data,
+    article.getCommentsFromAnArticle,
     TE.map(result => reply.send(result)),
     TE.mapLeft(result => reply.code(result.code).send(result.error)),
   )()

@@ -10,7 +10,11 @@ import {
 } from '@/ports/adapters/http/types'
 import { TagOutput } from '@/core/tag/types'
 
-import { ValidationError, UnknownError } from '@/helpers/errors'
+import {
+  ValidationError,
+  UnknownError,
+  NotFoundError,
+} from '@/helpers/errors'
 import { prisma } from '../prisma'
 
 type ArticleReturned = Omit<Article, 'createdAt' | 'updatedAt'> & {
@@ -59,6 +63,59 @@ export const createArticleInDB: CreateArticleInDB<ArticleReturned> = async (data
   }
 }
 
+type FetchArticleInput = {
+  slug: string
+  userId: string
+}
+export const getArticleFromDB = async ({ slug, userId }: FetchArticleInput) => {
+  const singleArticle = await prisma.article.findUnique({
+    where: {
+      slug,
+    },
+    include: {
+      tagList: true,
+      author: {
+        include: {
+          whoIsFollowing: {
+            where: {
+              userId,
+            },
+          },
+        },
+      },
+      favoritedArticles: {
+        where: {
+          userId,
+        },
+      },
+      _count: {
+        select: {
+          favoritedArticles: true,
+        },
+      },
+    },
+  })
+
+  if (!singleArticle) {
+    throw new NotFoundError(`Article ${slug} does not exist`)
+  }
+
+  const { _count, favoritedArticles, ...article } = singleArticle
+
+  return {
+    ...article,
+    author: {
+      ...article.author,
+      following: !!article.author.whoIsFollowing.length,
+    },
+    favorited: favoritedArticles.length > 0,
+    favoritesCount: _count ? _count.favoritedArticles : 0,
+    tagList: article.tagList.map(tag => tag.name),
+    createdAt: article.createdAt.toISOString(),
+    updatedAt: article.updatedAt.toISOString(),
+  }
+}
+
 type GetArticlesFromDBInput = {
   filter?: ArticlesFilter
   userId: string
@@ -81,8 +138,16 @@ export const getArticlesFromDB = async ({ filter, userId }: GetArticlesFromDBInp
     },
 
     include: {
-      author: true,
       tagList: true,
+      author: {
+        include: {
+          whoIsFollowing: {
+            where: {
+              userId,
+            },
+          },
+        },
+      },
       favoritedArticles: {
         where: {
           userId,
@@ -100,6 +165,10 @@ export const getArticlesFromDB = async ({ filter, userId }: GetArticlesFromDBInp
     const { _count, favoritedArticles, ...rest } = article
     return {
       ...rest,
+      author: {
+        ...rest.author,
+        following: !!rest.author.whoIsFollowing.length,
+      },
       favorited: favoritedArticles.length > 0,
       favoritesCount: _count ? _count.favoritedArticles : 0,
       tagList: article.tagList.map(({ name }) => name),
@@ -222,7 +291,15 @@ export const favoriteArticleInDB = async (data: FavoriteArticleInput) => {
         },
       },
       include: {
-        author: true,
+        author: {
+          include: {
+            whoIsFollowing: {
+              where: {
+                userId: data.userId,
+              },
+            },
+          },
+        },
         tagList: true,
         _count: {
           select: {
@@ -236,6 +313,10 @@ export const favoriteArticleInDB = async (data: FavoriteArticleInput) => {
 
     return {
       ...article,
+      author: {
+        ...article.author,
+        following: !!article.author.whoIsFollowing.length,
+      },
       favorited: true,
       favoritesCount: _count ? _count.favoritedArticles : 0,
       tagList: article.tagList.map(({ name }) => name),
@@ -268,7 +349,15 @@ export const unfavoriteArticleInDB = async (data: FavoriteArticleInput) => {
       },
     },
     include: {
-      author: true,
+      author: {
+        include: {
+          whoIsFollowing: {
+            where: {
+              userId: data.userId,
+            },
+          },
+        },
+      },
       tagList: true,
       _count: {
         select: {
@@ -282,6 +371,10 @@ export const unfavoriteArticleInDB = async (data: FavoriteArticleInput) => {
 
   return {
     ...article,
+    author: {
+      ...article.author,
+      following: !!article.author.whoIsFollowing.length,
+    },
     favorited: false,
     favoritesCount: _count ? _count.favoritedArticles : 0,
     tagList: article.tagList.map(({ name }) => name),
@@ -317,6 +410,48 @@ export const addCommentToAnArticleInDB: AddCommentToAnArticleInDB<CommentReturne
     createdAt: comment.createdAt.toISOString(),
     updatedAt: comment.updatedAt.toISOString(),
   }
+}
+
+type GetCommentsFromAnArticleInput = {
+  slug: string
+  userId: string
+}
+
+export const getCommentsFromAnArticleInDB = async (data: GetCommentsFromAnArticleInput) => {
+  const allComments = await prisma.article.findUnique({
+    where: {
+      slug: data.slug,
+    },
+    select: {
+      comments: {
+        include: {
+          author: {
+            include: {
+              whoIsFollowing: {
+                where: {
+                  userId: data.userId,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+
+  if (!allComments) {
+    return []
+  }
+
+  return allComments.comments.map(comment => ({
+    ...comment,
+    author: {
+      ...comment.author,
+      following: !!comment.author.whoIsFollowing.length,
+    },
+    createdAt: comment.createdAt.toISOString(),
+    updatedAt: comment.updatedAt.toISOString(),
+  }))
 }
 
 export const getTagsFromDB = async (): Promise<TagOutput[]> => {

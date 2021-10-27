@@ -29,6 +29,26 @@ export const createArticleInDB: CreateArticleInDB = async (data) => {
   }
 }
 
+type FetchArticleInput = {
+  slug: string
+  userId: string
+}
+
+export const getArticleFromDB = async (data: FetchArticleInput) => {
+  const article = await db.getArticleFromDB(data)
+
+  return {
+    ...article,
+    favoritesCount: 0,
+    author: {
+      username: article.author.username,
+      bio: article.author.bio ?? '',
+      image: article.author.image ?? '',
+      following: article.author.following,
+    },
+  }
+}
+
 type GetArticlesFromDBInput = {
   filter: ArticlesFilter
   userId: string
@@ -44,7 +64,7 @@ export const getArticlesFromDB: GetArticlesFromDB = async ({ filter, userId }) =
       username: article.author.username,
       bio: article.author.bio ?? '',
       image: article.author.image ?? '',
-      following: false,
+      following: article.author.following,
     },
   }))
 }
@@ -59,7 +79,7 @@ export const getArticlesFeedFromDB: GetArticlesFeedFromDB = async ({ filter, use
       username: article.author.username,
       bio: article.author.bio ?? '',
       image: article.author.image ?? '',
-      following: false,
+      following: true,
     },
   }))
 }
@@ -74,7 +94,7 @@ export const favoriteArticleInDB: FavoriteArticleInDB = async (data) => {
       username: article.author.username,
       bio: article.author.bio ?? '',
       image: article.author.image ?? '',
-      following: false,
+      following: article.author.following,
     },
   }
 }
@@ -88,7 +108,7 @@ export const unfavoriteArticleInDB: FavoriteArticleInDB = async (data) => {
       username: article.author.username,
       bio: article.author.bio ?? '',
       image: article.author.image ?? '',
-      following: false,
+      following: article.author.following,
     },
   }
 }
@@ -109,6 +129,28 @@ export const addCommentToAnArticleInDB: AddCommentToAnArticleInDB = async (data)
       following: false,
     },
   }
+}
+
+type GetCommentsFromAnArticleInput = {
+  slug: string
+  userId: string
+}
+
+export const getCommentsFromAnArticleInDB = async (data: GetCommentsFromAnArticleInput) => {
+  const comments = await db.getCommentsFromAnArticleInDB(data)
+
+  return comments.map(comment => ({
+    id: comment.id,
+    body: comment.body,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    author: {
+      username: comment.author.username,
+      bio: comment.author.bio ?? '',
+      image: comment.author.image ?? '',
+      following: comment.author.following,
+    },
+  }))
 }
 
 export const getTagsFromDB = db.getTagsFromDB

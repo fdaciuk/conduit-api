@@ -25,6 +25,22 @@ export function registerArticle (data: CreateArticle) {
   )
 }
 
+type FetchArticleInput = {
+  slug: string
+  userId: string
+}
+
+export function fetchArticle (data: FetchArticleInput) {
+  return pipe(
+    TE.tryCatch(
+      () => db.getArticleFromDB(data),
+      E.toError,
+    ),
+    TE.map(getArticleResponse),
+    TE.mapLeft(getError),
+  )
+}
+
 type FetchArticlesInput = {
   filter: ArticlesFilter
   userId: string
@@ -95,6 +111,22 @@ export function addCommentToAnArticle (data: CreateComment) {
   )
 }
 
+type GetCommentsFromAnArticleInput = {
+  slug: string
+  userId: string
+}
+
+export function getCommentsFromAnArticle (data: GetCommentsFromAnArticleInput) {
+  return pipe(
+    TE.tryCatch(
+      () => db.getCommentsFromAnArticleInDB(data),
+      E.toError,
+    ),
+    TE.map(getCommentsResponse),
+    TE.mapLeft(getError),
+  )
+}
+
 export function getTags () {
   return pipe(
     TE.tryCatch(
@@ -120,6 +152,12 @@ const getArticleResponse = (article: GetArticleResponseInput) => {
 const getCommentResponse = (comment: CommentOutput) => {
   return {
     comment,
+  }
+}
+
+const getCommentsResponse = (comments: CommentOutput[]) => {
+  return {
+    comments,
   }
 }
 
