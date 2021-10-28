@@ -53,3 +53,12 @@ export const createArticleCodec = t.intersection([
 
 export type CreateArticle = t.TypeOf<typeof createArticleCodec>
 export type CreateArticleOutput = t.OutputOf<typeof createArticleCodec>
+
+export const updateArticleCodec = t.partial({
+  title: withMessage(t.string, () => 'Invalid title'),
+  description: withMessage(t.string, () => 'Invalid description'),
+  body: withMessage(t.string, () => 'Invalid body'),
+})
+
+export type UpdateArticle = t.TypeOf<typeof updateArticleCodec>
+export type UpdateArticleOutput = t.OutputOf<typeof updateArticleCodec>
