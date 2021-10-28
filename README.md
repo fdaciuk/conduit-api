@@ -21,6 +21,26 @@ yarn
 yarn test:watch
 ```
 
+3. Get the server and database up:
+
+```terminal
+yarn dev
+```
+
+To stop the server watch, just press `Ctrl + c`.
+
+4. Stop docker after get server down:
+
+```
+yarn docker:down
+```
+
+5. Destroy all data from DB:
+
+```
+yarn docker:destroy
+```
+
 ## Scripts
 
 | Script                        | Description                                                   |
@@ -94,7 +114,7 @@ This project uses Hexagonal Architecture (Ports & Adapters) with Functional Prog
 | `src/core/types`                     | Here you can put the types that are not related with any of your domains or entities.                                                                               |
 | `src/helpers`                        | Here you can put your global helpers.                                                                                                                               |
 | `src/ports`                          | Anything with external world contact. When you need to access something on `core`, you must use an `adapter`.                                                       |
-| `src/ports/adapters`                 | Adapters for ports. For example: You can have a `database` adapter that can use `Postgres` ou `MariaDB`. An `http` adapter that can consume `express` or `fastify`. |
+| `src/ports/adapters`                 | Adapters for ports. For example: You can have a `database` adapter that can use `Postgres` or `MariaDB`. An `http` adapter that can consume `express` or `fastify`. |
 | `src/ports/<port>`                   | Here you can create your raw `ports` with real implementation: `express` / `fastify` as http server, `postgres` / `mariadb` as databases, etc.                      |
 | `.env.example`                       | List of Environment Variables. Please, copy this file and create a new `.env` file to use Env Vars.                                                                 |
 | `jest.config.integration.js`         | Jest configuration file for integration tests.                                                                                                                      |
