@@ -89,6 +89,20 @@ const articleRoutes: Routes = {
     }
   }),
 
+  'DELETE /api/articles/:slug': withAuth(async (request, response) => {
+    const payload = getPayload(request.auth)
+    const slug = 'slug'
+
+    pipe(
+      article.deleteArticle({
+        slug: request.params![slug] ?? '',
+        userId: payload.id,
+      }),
+      TE.map(() => httpResponse(response)),
+      TE.mapLeft(result => httpResponse(response, result.error, result.code)),
+    )()
+  }),
+
   'GET /api/articles/feed': withAuth(async (request, response) => {
     const payload = getPayload(request.auth)
 
@@ -163,6 +177,25 @@ const articleRoutes: Routes = {
       data,
       article.getCommentsFromAnArticle,
       TE.map(result => httpResponse(response, result)),
+      TE.mapLeft(result => httpResponse(response, result.error, result.code)),
+    )()
+  }),
+
+  'DELETE /api/articles/:slug/comments/:id': withAuth(async (request, response) => {
+    const payload = getPayload(request.auth)
+    const slug = 'slug'
+    const id = 'id'
+
+    const data = {
+      commentId: Number(request.params![id]),
+      slug: request.params![slug] ?? '',
+      userId: payload.id,
+    }
+
+    pipe(
+      data,
+      article.deleteComment,
+      TE.map(() => httpResponse(response)),
       TE.mapLeft(result => httpResponse(response, result.error, result.code)),
     )()
   }),

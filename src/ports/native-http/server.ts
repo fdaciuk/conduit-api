@@ -38,10 +38,14 @@ const errorHandler: ErrorHandler = (response) => {
   }
 }
 
-type HttpResponse = (response: ServerResponse, data: Record<string, any>, status?: number) => void
+type HttpResponse = (response: ServerResponse, data?: Record<string, any>, status?: number) => void
 export const httpResponse: HttpResponse = (response, data, status = 200) => {
   response.writeHead(status, DEFAULT_HEADER)
-  response.write(JSON.stringify(data))
+
+  if (data) {
+    response.write(JSON.stringify(data))
+  }
+
   return response.end()
 }
 
@@ -58,6 +62,12 @@ const mapRouteToResource: MapRouteToResource = (routes, request) => {
 
     if (resource === 'articles' && route !== 'feed') {
       const param = 'slug'
+      request.params![param] = route
+      return `:${param}`
+    }
+
+    if (resource === 'comments') {
+      const param = 'id'
       request.params![param] = route
       return `:${param}`
     }
