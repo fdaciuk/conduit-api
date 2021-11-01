@@ -113,6 +113,25 @@ app.get<GetArticlesApi>('/api/articles', tryAuthOptions, (req, reply) => {
   )()
 })
 
+type DeleteArticleApi = {
+  Params: {
+    slug: string
+  }
+}
+
+app.delete<DeleteArticleApi>('/api/articles/:slug', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
+  pipe(
+    article.deleteArticle({
+      slug: req.params.slug,
+      userId: payload.id,
+    }),
+    TE.map(() => reply.send()),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
 type FavoriteArticleApi = {
   Params: {
     slug: Slug

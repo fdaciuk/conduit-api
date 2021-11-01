@@ -81,6 +81,20 @@ articleRoutes.get('/api/articles', tryAuth, (req: Request, res: Response) => {
   )()
 })
 
+articleRoutes.delete('/api/articles/:slug', auth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+  const slugProp = 'slug'
+
+  pipe(
+    article.deleteArticle({
+      slug: req.params[slugProp] ?? '',
+      userId: payload.id,
+    }),
+    TE.map(() => res.send()),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
 articleRoutes.post('/api/articles/:slug/favorite', auth, (req: Request, res: Response) => {
   const payload = getPayload(req.auth)
   const slugProp = 'slug'
