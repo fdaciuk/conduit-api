@@ -1,5 +1,5 @@
 import slugify from 'slugify'
-import { CreateArticle } from '@/core/article/types'
+import { CreateArticle, UpdateArticle } from '@/core/article/types'
 import { CreateComment, CommentOutput } from '@/core/comment/types'
 import {
   ArticlesFilter,
@@ -29,6 +29,26 @@ export const createArticleInDB: CreateArticleInDB = async (data) => {
   }
 }
 
+type UpdateArticleInDB = (data: UpdateArticle) => Promise<DBArticle>
+export const updateArticleInDB: UpdateArticleInDB = async (data) => {
+  const updatedSlug = slugify(data.title ?? '', { lower: true }) || undefined
+
+  const article = await db.updateArticleInDB({
+    ...data,
+    updatedSlug,
+  })
+
+  return {
+    ...article,
+    author: {
+      username: article.author.username,
+      bio: article.author.bio ?? '',
+      image: article.author.image ?? '',
+      following: false,
+    },
+  }
+}
+
 type FetchArticleInput = {
   slug: string
   userId: string
@@ -39,7 +59,6 @@ export const getArticleFromDB = async (data: FetchArticleInput) => {
 
   return {
     ...article,
-    favoritesCount: 0,
     author: {
       username: article.author.username,
       bio: article.author.bio ?? '',
@@ -83,6 +102,8 @@ export const getArticlesFeedFromDB: GetArticlesFeedFromDB = async ({ filter, use
     },
   }))
 }
+
+export const deleteArticleFromDB = db.deleteArticleFromDB
 
 type FavoriteArticleInDB = (data: FavoriteArticleInput) => Promise<DBArticle>
 export const favoriteArticleInDB: FavoriteArticleInDB = async (data) => {
@@ -153,4 +174,5 @@ export const getCommentsFromAnArticleInDB = async (data: GetCommentsFromAnArticl
   }))
 }
 
+export const deleteCommentFromDB = db.deleteCommentFromDB
 export const getTagsFromDB = db.getTagsFromDB

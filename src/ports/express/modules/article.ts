@@ -23,6 +23,37 @@ articleRoutes.post('/api/articles', auth, async (req: Request, res: Response) =>
   )()
 })
 
+articleRoutes.put('/api/articles/:slug', auth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+  const slugProp = 'slug'
+
+  const data = {
+    ...req.body.article,
+    slug: req.params[slugProp],
+    authorId: payload.id,
+  }
+
+  pipe(
+    data,
+    article.updateArticle,
+    TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
+articleRoutes.get('/api/articles/feed', auth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+
+  pipe(
+    article.fetchArticlesFeed({
+      filter: req.query,
+      userId: payload.id,
+    }),
+    TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
 articleRoutes.get('/api/articles/:slug', tryAuth, (req: Request, res: Response) => {
   const payload = getPayload(req.auth)
   const propSlug = 'slug'
@@ -50,15 +81,16 @@ articleRoutes.get('/api/articles', tryAuth, (req: Request, res: Response) => {
   )()
 })
 
-articleRoutes.get('/api/articles/feed', auth, (req: Request, res: Response) => {
+articleRoutes.delete('/api/articles/:slug', auth, (req: Request, res: Response) => {
   const payload = getPayload(req.auth)
+  const slugProp = 'slug'
 
   pipe(
-    article.fetchArticlesFeed({
-      filter: req.query,
+    article.deleteArticle({
+      slug: req.params[slugProp] ?? '',
       userId: payload.id,
     }),
-    TE.map(result => res.json(result)),
+    TE.map(() => res.send()),
     TE.mapLeft(result => res.status(result.code).json(result.error)),
   )()
 })
@@ -122,6 +154,25 @@ articleRoutes.get('/api/articles/:slug/comments', tryAuth, (req: Request, res: R
     data,
     article.getCommentsFromAnArticle,
     TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
+articleRoutes.delete('/api/articles/:slug/comments/:id', auth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+  const commentIdProp = 'id'
+  const slugProp = 'slug'
+
+  const data = {
+    commentId: Number(req.params[commentIdProp]),
+    slug: req.params[slugProp] ?? '',
+    userId: payload.id,
+  }
+
+  pipe(
+    data,
+    article.deleteComment,
+    TE.map(() => res.send()),
     TE.mapLeft(result => res.status(result.code).json(result.error)),
   )()
 })
