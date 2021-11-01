@@ -1,7 +1,7 @@
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import { Slug } from '@/core/types/slug'
-import { CreateArticle } from '@/core/article/types'
+import { CreateArticle, UpdateArticle } from '@/core/article/types'
 import { CreateComment } from '@/core/comment/types'
 import { getPayload } from '@/ports/adapters/http/http'
 import {
@@ -14,7 +14,7 @@ import { app, authOptions, tryAuthOptions } from '@/ports/fastify/server'
 
 type CreateArticleApi = {
   Body: {
-    article: CreateArticle
+    article: Omit<CreateArticle, 'authorId'>
   }
 }
 
@@ -29,6 +29,49 @@ app.post<CreateArticleApi>('/api/articles', authOptions, (req, reply) => {
   pipe(
     data,
     article.registerArticle,
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
+type UpdateArticleApi = {
+  Params: {
+    slug: Slug
+  }
+  Body: {
+    article: Omit<UpdateArticle, 'authorId'>
+  }
+}
+
+app.put<UpdateArticleApi>('/api/articles/:slug', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
+  const data = {
+    ...req.body.article,
+    slug: req.params.slug,
+    authorId: payload.id,
+  }
+
+  pipe(
+    data,
+    article.updateArticle,
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
+type FeedArticlesApi = {
+  Querystring: PaginationFilter
+}
+
+app.get<FeedArticlesApi>('/api/articles/feed', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
+  pipe(
+    article.fetchArticlesFeed({
+      filter: req.query,
+      userId: payload.id,
+    }),
     TE.map(result => reply.send(result)),
     TE.mapLeft(result => reply.code(result.code).send(result.error)),
   )()
@@ -62,23 +105,6 @@ app.get<GetArticlesApi>('/api/articles', tryAuthOptions, (req, reply) => {
 
   pipe(
     article.fetchArticles({
-      filter: req.query,
-      userId: payload.id,
-    }),
-    TE.map(result => reply.send(result)),
-    TE.mapLeft(result => reply.code(result.code).send(result.error)),
-  )()
-})
-
-type FeedArticlesApi = {
-  Querystring: PaginationFilter
-}
-
-app.get<FeedArticlesApi>('/api/articles/feed', authOptions, (req, reply) => {
-  const payload = getPayload(req.raw.auth)
-
-  pipe(
-    article.fetchArticlesFeed({
       filter: req.query,
       userId: payload.id,
     }),
