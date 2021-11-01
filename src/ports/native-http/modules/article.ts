@@ -3,16 +3,13 @@ import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
 import * as article from '@/ports/adapters/http/modules/article'
 import { getPayload } from '@/ports/adapters/http/http'
-import { CreateArticle } from '@/core/article/types'
+import { CreateArticle, UpdateArticle } from '@/core/article/types'
+import { CreateComment } from '@/core/comment/types'
+import { Slug } from '@/core/types'
 import { Routes, httpResponse } from '../server'
 import { withAuth, withTryAuth } from '../middlewares'
-import { CreateComment } from '@/core/comment/types'
 
-type GetPropFromRequestBody =
-  <T extends 'article' | 'comment'>(data: string, prop: T) => T extends 'article'
-    ? CreateArticle
-    : CreateComment
-
+type GetPropFromRequestBody = <T>(data: string, prop: string) => T
 const getPropFromRequestBody: GetPropFromRequestBody = (data, prop) => {
   return pipe(
     E.tryCatch(
@@ -32,7 +29,7 @@ const articleRoutes: Routes = {
 
     for await (const body of request) {
       const data = {
-        ...getPropFromRequestBody(body, 'article'),
+        ...getPropFromRequestBody<CreateArticle>(body, 'article'),
         authorId: payload.id,
       }
 
@@ -70,6 +67,26 @@ const articleRoutes: Routes = {
       TE.map(result => httpResponse(response, result)),
       TE.mapLeft(result => httpResponse(response, result.error, result.code)),
     )()
+  }),
+
+  'PUT /api/articles/:slug': withAuth(async (request, response) => {
+    const payload = getPayload(request.auth)
+    const slug = 'slug'
+
+    for await (const body of request) {
+      const data: UpdateArticle = {
+        ...getPropFromRequestBody<UpdateArticle>(body, 'article'),
+        slug: request.params![slug] as Slug,
+        authorId: payload.id,
+      }
+
+      pipe(
+        data,
+        article.updateArticle,
+        TE.map(result => httpResponse(response, result)),
+        TE.mapLeft(result => httpResponse(response, result.error, result.code)),
+      )()
+    }
   }),
 
   'GET /api/articles/feed': withAuth(async (request, response) => {
@@ -118,14 +135,14 @@ const articleRoutes: Routes = {
     const slug = 'slug'
 
     for await (const body of request) {
-      const data = {
-        ...getPropFromRequestBody(body, 'comment'),
+      const data: CreateComment = {
+        ...getPropFromRequestBody<CreateComment>(body, 'comment'),
         authorId: payload.id,
-        articleSlug: request.params![slug],
+        articleSlug: request.params![slug] as Slug,
       }
 
       pipe(
-        data as CreateComment,
+        data,
         article.addCommentToAnArticle,
         TE.map(result => httpResponse(response, result)),
         TE.mapLeft(result => httpResponse(response, result.error, result.code)),
