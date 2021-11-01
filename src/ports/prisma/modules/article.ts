@@ -9,11 +9,13 @@ import {
   FavoriteArticleInput,
 } from '@/ports/adapters/http/types'
 import { TagOutput } from '@/core/tag/types'
+import { UpdateArticleOutput } from '@/core/article/types'
 
 import {
   ValidationError,
   UnknownError,
   NotFoundError,
+  ForbiddenError,
 } from '@/helpers/errors'
 import { prisma } from '../prisma'
 
@@ -60,6 +62,81 @@ export const createArticleInDB: CreateArticleInDB<ArticleReturned> = async (data
     }
   } catch (e) {
     throw new ValidationError(`The article "${data.title}" already exists`)
+  }
+}
+
+type UpdateArticleInput = UpdateArticleOutput & {
+  updatedSlug?: string | undefined
+}
+export const updateArticleInDB = async (data: UpdateArticleInput) => {
+  const articleToUpdate = await prisma.article.findUnique({
+    where: {
+      slug: data.slug,
+    },
+    include: {
+      author: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  })
+
+  if (!articleToUpdate) {
+    throw new NotFoundError(`The article ${data.slug} does not exist`)
+  }
+
+  if (articleToUpdate.author.id !== data.authorId) {
+    throw new ForbiddenError(`You can't update ${data.slug} article. It's not yours. Get out!`)
+  }
+
+  try {
+    const updatedArticle = await prisma.article.update({
+      where: {
+        slug: data.slug,
+      },
+      data: {
+        title: data.title,
+        body: data.body,
+        description: data.description,
+        slug: data.updatedSlug,
+      },
+      include: {
+        tagList: true,
+        author: true,
+        favoritedArticles: {
+          where: {
+            userId: data.authorId,
+          },
+        },
+        _count: {
+          select: {
+            favoritedArticles: true,
+          },
+        },
+      },
+    })
+
+    const { _count, favoritedArticles, ...article } = updatedArticle
+
+    return {
+      ...article,
+      author: {
+        ...article.author,
+        following: false,
+      },
+      favorited: favoritedArticles.length > 0,
+      favoritesCount: _count ? _count.favoritedArticles : 0,
+      tagList: article.tagList.map(tag => tag.name),
+      createdAt: article.createdAt.toISOString(),
+      updatedAt: article.updatedAt.toISOString(),
+    }
+  } catch (e) {
+    if (e instanceof Error) {
+      throw new ValidationError(e.message)
+    }
+
+    throw new UnknownError()
   }
 }
 

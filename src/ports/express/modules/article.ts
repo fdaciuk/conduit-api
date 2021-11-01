@@ -23,6 +23,37 @@ articleRoutes.post('/api/articles', auth, async (req: Request, res: Response) =>
   )()
 })
 
+articleRoutes.put('/api/articles/:slug', auth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+  const slugProp = 'slug'
+
+  const data = {
+    ...req.body.article,
+    slug: req.params[slugProp],
+    authorId: payload.id,
+  }
+
+  pipe(
+    data,
+    article.updateArticle,
+    TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
+articleRoutes.get('/api/articles/feed', auth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+
+  pipe(
+    article.fetchArticlesFeed({
+      filter: req.query,
+      userId: payload.id,
+    }),
+    TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
 articleRoutes.get('/api/articles/:slug', tryAuth, (req: Request, res: Response) => {
   const payload = getPayload(req.auth)
   const propSlug = 'slug'
@@ -42,19 +73,6 @@ articleRoutes.get('/api/articles', tryAuth, (req: Request, res: Response) => {
 
   pipe(
     article.fetchArticles({
-      filter: req.query,
-      userId: payload.id,
-    }),
-    TE.map(result => res.json(result)),
-    TE.mapLeft(result => res.status(result.code).json(result.error)),
-  )()
-})
-
-articleRoutes.get('/api/articles/feed', auth, (req: Request, res: Response) => {
-  const payload = getPayload(req.auth)
-
-  pipe(
-    article.fetchArticlesFeed({
       filter: req.query,
       userId: payload.id,
     }),

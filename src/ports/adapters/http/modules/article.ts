@@ -1,7 +1,11 @@
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
-import { CreateArticle, ArticleOutput } from '@/core/article/types'
+import {
+  CreateArticle,
+  UpdateArticle,
+  ArticleOutput,
+} from '@/core/article/types'
 import { CreateComment, CommentOutput } from '@/core/comment/types'
 import { TagOutput } from '@/core/tag/types'
 import * as db from '@/ports/adapters/db'
@@ -20,6 +24,15 @@ export function registerArticle (data: CreateArticle) {
   return pipe(
     data,
     article.registerArticle(db.createArticleInDB),
+    TE.map(getArticleResponse),
+    TE.mapLeft(getError),
+  )
+}
+
+export function updateArticle (data: UpdateArticle) {
+  return pipe(
+    data,
+    article.updateArticle(db.updateArticleInDB),
     TE.map(getArticleResponse),
     TE.mapLeft(getError),
   )

@@ -5,24 +5,34 @@ import { mapAll, unsafe } from '@/config/tests/fixtures'
 
 const data: UpdateArticle = {
   title: 'New Article title',
+  slug: unsafe('article-slug'),
+  authorId: 'author-id',
 }
 
 const dataWithAllFieldsValid: UpdateArticle = {
   title: 'New Article title',
   body: 'New body',
   description: 'New description',
+  slug: unsafe('article-slug'),
+  authorId: 'author-id',
 }
 
 const dataWithInvalidTitle: UpdateArticle = {
   title: unsafe(1),
+  slug: unsafe('article-slug'),
+  authorId: 'author-id',
 }
 
 const dataWithInvalidBody: UpdateArticle = {
   body: unsafe(true),
+  slug: unsafe('article-slug'),
+  authorId: 'author-id',
 }
 
 const dataWithInvalidDescription: UpdateArticle = {
   description: unsafe([1, 2, 3]),
+  slug: unsafe('article-slug'),
+  authorId: 'author-id',
 }
 
 const updateOk: OutsideUpdateArticle<string> = async (data: UpdateArticle) => {
