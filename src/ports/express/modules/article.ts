@@ -158,6 +158,25 @@ articleRoutes.get('/api/articles/:slug/comments', tryAuth, (req: Request, res: R
   )()
 })
 
+articleRoutes.delete('/api/articles/:slug/comments/:id', auth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+  const commentIdProp = 'id'
+  const slugProp = 'slug'
+
+  const data = {
+    commentId: Number(req.params[commentIdProp]),
+    slug: req.params[slugProp] ?? '',
+    userId: payload.id,
+  }
+
+  pipe(
+    data,
+    article.deleteComment,
+    TE.map(() => res.send()),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
 articleRoutes.get('/api/tags', (_req, res) => {
   pipe(
     article.getTags(),

@@ -174,4 +174,5 @@ export const getCommentsFromAnArticleInDB = async (data: GetCommentsFromAnArticl
   }))
 }
 
+export const deleteCommentFromDB = db.deleteCommentFromDB
 export const getTagsFromDB = db.getTagsFromDB

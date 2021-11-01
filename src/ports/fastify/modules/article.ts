@@ -213,6 +213,30 @@ app.get<GetCommentsFromAnArticleApi>('/api/articles/:slug/comments', tryAuthOpti
   )()
 })
 
+type DeleteCommentApi = {
+  Params: {
+    slug: string
+    id: number
+  }
+}
+
+app.delete<DeleteCommentApi>('/api/articles/:slug/comments/:id', authOptions, (req, reply) => {
+  const payload = getPayload(req.raw.auth)
+
+  const data = {
+    commentId: Number(req.params.id),
+    slug: req.params.slug,
+    userId: payload.id,
+  }
+
+  pipe(
+    data,
+    article.deleteComment,
+    TE.map(() => reply.send()),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
 app.get('/api/tags', (_req, reply) => {
   pipe(
     article.getTags(),

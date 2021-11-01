@@ -324,7 +324,7 @@ type DeleteArticleInput = {
 }
 
 export async function deleteArticleFromDB (data: DeleteArticleInput) {
-  const articleToUpdate = await prisma.article.findUnique({
+  const articleToDelete = await prisma.article.findUnique({
     where: {
       slug: data.slug,
     },
@@ -337,11 +337,11 @@ export async function deleteArticleFromDB (data: DeleteArticleInput) {
     },
   })
 
-  if (!articleToUpdate) {
+  if (!articleToDelete) {
     throw new NotFoundError(`The article ${data.slug} does not exist`)
   }
 
-  if (articleToUpdate.author.id !== data.userId) {
+  if (articleToDelete.author.id !== data.userId) {
     throw new ForbiddenError(`You can't delete ${data.slug} article. It's not yours. Get out!`)
   }
 
@@ -563,6 +563,47 @@ export const getCommentsFromAnArticleInDB = async (data: GetCommentsFromAnArticl
     createdAt: comment.createdAt.toISOString(),
     updatedAt: comment.updatedAt.toISOString(),
   }))
+}
+
+type DeleteCommentInput = {
+  slug: string
+  commentId: number
+  userId: string
+}
+
+export const deleteCommentFromDB = async (data: DeleteCommentInput) => {
+  const commentToDelete = await prisma.comment.findUnique({
+    where: {
+      id: data.commentId,
+    },
+    select: {
+      id: true,
+      article: {
+        select: {
+          slug: true,
+        },
+      },
+      author: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  })
+
+  if (!commentToDelete) {
+    throw new NotFoundError(`The comment ID ${data.commentId} does not exist on article ${data.slug}`)
+  }
+
+  if (commentToDelete.author.id !== data.userId) {
+    throw new ForbiddenError(`You can't delete the comment with ID ${data.commentId}. It's not yours. Get out!`)
+  }
+
+  await prisma.comment.delete({
+    where: {
+      id: data.commentId,
+    },
+  })
 }
 
 export const getTagsFromDB = async (): Promise<TagOutput[]> => {
