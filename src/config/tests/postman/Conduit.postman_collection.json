@@ -1496,10 +1496,6 @@
 						"method": "POST",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
