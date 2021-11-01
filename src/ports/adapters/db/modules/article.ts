@@ -103,6 +103,8 @@ export const getArticlesFeedFromDB: GetArticlesFeedFromDB = async ({ filter, use
   }))
 }
 
+export const deleteArticleFromDB = db.deleteArticleFromDB
+
 type FavoriteArticleInDB = (data: FavoriteArticleInput) => Promise<DBArticle>
 export const favoriteArticleInDB: FavoriteArticleInDB = async (data) => {
   const article = await db.favoriteArticleInDB(data)

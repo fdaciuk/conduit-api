@@ -318,6 +318,40 @@ export const getArticlesFeedFromDB = async ({ filter, userId }: GetArticlesFeedF
   })
 }
 
+type DeleteArticleInput = {
+  slug: string
+  userId: string
+}
+
+export async function deleteArticleFromDB (data: DeleteArticleInput) {
+  const articleToUpdate = await prisma.article.findUnique({
+    where: {
+      slug: data.slug,
+    },
+    include: {
+      author: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  })
+
+  if (!articleToUpdate) {
+    throw new NotFoundError(`The article ${data.slug} does not exist`)
+  }
+
+  if (articleToUpdate.author.id !== data.userId) {
+    throw new ForbiddenError(`You can't delete ${data.slug} article. It's not yours. Get out!`)
+  }
+
+  await prisma.article.delete({
+    where: {
+      slug: data.slug,
+    },
+  })
+}
+
 function authorFilter (author?: string) {
   return {
     author: {

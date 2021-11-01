@@ -86,6 +86,21 @@ export function fetchArticlesFeed ({ filter, userId }: FetchArticlesFeedInput) {
   )
 }
 
+type DeleteArticleInput = {
+  slug: string
+  userId: string
+}
+
+export function deleteArticle (data: DeleteArticleInput) {
+  return pipe(
+    TE.tryCatch(
+      () => db.deleteArticleFromDB(data),
+      E.toError,
+    ),
+    TE.mapLeft(getError),
+  )
+}
+
 export function favoriteArticle (data: FavoriteArticleInput) {
   return pipe(
     TE.tryCatch(
