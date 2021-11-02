@@ -6,7 +6,12 @@ import { app } from './server'
 const PORT = env('PORT')
 
 export function start () {
-  http
-    .createServer(app)
-    .listen(PORT, () => console.log(`Server is listening on port ${PORT}`))
+  return new Promise((resolve) => {
+    http
+      .createServer(app)
+      .listen(PORT, () => {
+        console.log(`Server is listening on port ${PORT}`)
+        resolve(null)
+      })
+  })
 }

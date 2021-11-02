@@ -9,9 +9,9 @@ export const withAuth: WithAuthMiddleware = (handler) => {
     pipe(
       authMiddleware(request.headers.authorization),
       TE.map(
-        async (payload) => {
+        (payload) => {
           request.auth = payload
-          await handler(request, response)
+          return handler(request, response)
         },
       ),
       TE.mapLeft(
@@ -26,15 +26,15 @@ export const withTryAuth: WithAuthMiddleware = (handler) => {
     pipe(
       authMiddleware(request.headers.authorization),
       TE.map(
-        async (payload) => {
+        (payload) => {
           request.auth = payload
-          await handler(request, response)
+          return handler(request, response)
         },
       ),
       TE.mapLeft(
-        async () => {
+        () => {
           request.auth = undefined
-          await handler(request, response)
+          return handler(request, response)
         },
       ),
     )()
