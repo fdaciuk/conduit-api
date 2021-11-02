@@ -21,7 +21,10 @@ app.use(articleRoutes)
 app.use(profileRoutes)
 
 export function start () {
-  app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`)
+  return new Promise((resolve) => {
+    app.listen(PORT, () => {
+      console.log(`Server is listening on port ${PORT}`)
+      resolve(null)
+    })
   })
 }
