@@ -12,7 +12,7 @@ const profileRoutes: Routes = {
 
     pipe(
       user.getProfile({
-        username: request.params![username] ?? '',
+        username: request.params?.[username] ?? '',
         userId: payload.id,
       }),
       TE.map(result => httpResponse(response, result)),
@@ -26,7 +26,7 @@ const profileRoutes: Routes = {
 
     pipe(
       user.followUser({
-        userToFollow: request.params![username] ?? '',
+        userToFollow: request.params?.[username] ?? '',
         userId: payload.id,
       }),
       TE.map(result => httpResponse(response, result)),
@@ -40,7 +40,7 @@ const profileRoutes: Routes = {
 
     pipe(
       user.unfollowUser({
-        userToUnfollow: request.params![username] ?? '',
+        userToUnfollow: request.params?.[username] ?? '',
         userId: payload.id,
       }),
       TE.map(result => httpResponse(response, result)),

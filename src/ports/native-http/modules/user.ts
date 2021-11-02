@@ -1,4 +1,4 @@
-import { pipe } from 'fp-ts/function'
+import { pipe, identity } from 'fp-ts/function'
 import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
 import * as user from '@/ports/adapters/http/modules/user'
@@ -14,10 +14,7 @@ const getUserFromRequestBody: GetUserFromRequestBody = (data) => {
       () => JSON.parse(data),
       E.toError,
     ),
-    E.fold(
-      (error) => error,
-      (body) => body.user || {},
-    ),
+    E.fold(identity, (body) => body.user ?? {}),
   )
 }
 

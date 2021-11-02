@@ -1,4 +1,4 @@
-import { pipe } from 'fp-ts/function'
+import { pipe, identity } from 'fp-ts/function'
 import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
 import * as article from '@/ports/adapters/http/modules/article'
@@ -16,10 +16,7 @@ const getPropFromRequestBody: GetPropFromRequestBody = (data, prop) => {
       () => JSON.parse(data),
       E.toError,
     ),
-    E.fold(
-      (error) => error,
-      (body) => body[prop] || {},
-    ),
+    E.fold(identity, (body) => body[prop] ?? {}),
   )
 }
 
@@ -48,7 +45,7 @@ const articleRoutes: Routes = {
 
     pipe(
       article.fetchArticle({
-        slug: request.params![slug] ?? '',
+        slug: request.params?.[slug] ?? '',
         userId: payload.id,
       }),
       TE.map(result => httpResponse(response, result)),
@@ -76,7 +73,7 @@ const articleRoutes: Routes = {
     for await (const body of request) {
       const data: UpdateArticle = {
         ...getPropFromRequestBody<UpdateArticle>(body, 'article'),
-        slug: request.params![slug] as Slug,
+        slug: request.params?.[slug] as Slug,
         authorId: payload.id,
       }
 
@@ -95,7 +92,7 @@ const articleRoutes: Routes = {
 
     pipe(
       article.deleteArticle({
-        slug: request.params![slug] ?? '',
+        slug: request.params?.[slug] ?? '',
         userId: payload.id,
       }),
       TE.map(() => httpResponse(response)),
@@ -123,7 +120,7 @@ const articleRoutes: Routes = {
     pipe(
       article.favoriteArticle({
         userId: payload.id,
-        slug: request.params![slug] ?? '',
+        slug: request.params?.[slug] ?? '',
       }),
       TE.map(result => httpResponse(response, result)),
       TE.mapLeft(result => httpResponse(response, result.error, result.code)),
@@ -137,7 +134,7 @@ const articleRoutes: Routes = {
     pipe(
       article.unfavoriteArticle({
         userId: payload.id,
-        slug: request.params![slug] ?? '',
+        slug: request.params?.[slug] ?? '',
       }),
       TE.map(result => httpResponse(response, result)),
       TE.mapLeft(result => httpResponse(response, result.error, result.code)),
@@ -152,7 +149,7 @@ const articleRoutes: Routes = {
       const data: CreateComment = {
         ...getPropFromRequestBody<CreateComment>(body, 'comment'),
         authorId: payload.id,
-        articleSlug: request.params![slug] as Slug,
+        articleSlug: request.params?.[slug] as Slug,
       }
 
       pipe(
@@ -169,7 +166,7 @@ const articleRoutes: Routes = {
     const slug = 'slug'
 
     const data = {
-      slug: request.params![slug] ?? '',
+      slug: request.params?.[slug] ?? '',
       userId: payload.id,
     }
 
@@ -187,8 +184,8 @@ const articleRoutes: Routes = {
     const id = 'id'
 
     const data = {
-      commentId: Number(request.params![id]),
-      slug: request.params![slug] ?? '',
+      commentId: Number(request.params?.[id]),
+      slug: request.params?.[slug] ?? '',
       userId: payload.id,
     }
 
