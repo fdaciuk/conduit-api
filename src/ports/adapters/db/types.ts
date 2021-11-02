@@ -2,7 +2,7 @@ import {
   UserOutput,
   CreateUserOutput,
   UpdateUserOutput,
-  LoginUser,
+  LoginUserOutput,
 } from '@/core/user/types'
 import { CommentOutput, CreateComment } from '@/core/comment/types'
 import { ArticleOutput, CreateArticleOutput } from '@/core/article/types'
@@ -30,7 +30,7 @@ type CreateUserData = CreateUserOutput & {
 
 export type CreateUserInDB<T = DBUser> = (data: CreateUserData) => Promise<T>
 
-export type Login<T = DBUser> = (data: LoginUser) => Promise<T | null>
+export type Login<T = DBUser> = (data: LoginUserOutput) => Promise<T | null>
 
 type UpdateUserData = UpdateUserOutput & {
   password?: string
