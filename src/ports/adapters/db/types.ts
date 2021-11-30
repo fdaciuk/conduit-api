@@ -59,7 +59,7 @@ type UnfollowUserInput = {
 
 export type UnfollowUser<T = DBUser> = (input: UnfollowUserInput) => Promise<T>
 
-type CreateArticleInput = CreateArticleOutput & {
+export type CreateArticleInput = CreateArticleOutput & {
   slug: string
 }
 

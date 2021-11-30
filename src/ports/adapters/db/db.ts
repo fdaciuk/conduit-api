@@ -1,3 +1,3 @@
-// import * as db from '@/ports/db-in-memory'
-import * as db from '@/ports/prisma'
-export { db as database }
+import { db } from './setup'
+const database = db.getProvider()
+export { database }

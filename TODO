@@ -1,0 +1,2 @@
+- [x] Criar uma função `createProvider` para abstrair os providers
+- [ ] Fazer tipagem para funções do módulo de DB

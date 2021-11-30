@@ -1,4 +1,4 @@
-import * as jwt from '@/ports/jwt/jose'
+import { jwt } from './provider'
 import { AuthorId, AuthorIdOutput } from '@/core/profile/types'
 import { ValidationError } from '@/helpers/errors'
 
@@ -26,8 +26,10 @@ export const verifyToken = async (token: string) => {
   throw new ValidationError('Invalid payload. User ID is missing')
 }
 
-type Obj = {}
+function isValidPayload (payload: unknown): payload is JWTPayload {
+  return isObject(payload) && 'id' in payload
+}
 
-function isValidPayload (payload: Obj): payload is JWTPayload {
-  return 'id' in payload
+function isObject (value: unknown): value is object {
+  return Object.prototype.toString.call(value) === '[object Object]'
 }

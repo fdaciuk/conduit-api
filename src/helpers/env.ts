@@ -3,12 +3,11 @@ import { failure } from 'io-ts/PathReporter'
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
 import { withMessage, NonEmptyString, NumberFromString } from 'io-ts-types'
-import { ValidationError } from '@/helpers/errors'
 
 const envsCodecs = {
-  HTTP_PORT: createUnionCodec('HTTP_PORT', ['express', 'fastify']),
-  DB_PORT: createUnionCodec('DB_PORT', ['db-in-memory', 'prisma']),
-  JWT_PORT: createUnionCodec('JWT_PORT', ['jose']),
+  HTTP_PROVIDER: createUnionCodec('HTTP_PROVIDER', ['express', 'fastify']),
+  DB_PROVIDER: createUnionCodec('DB_PROVIDER', ['db-in-memory', 'prisma']),
+  JWT_PROVIDER: createUnionCodec('JWT_PROVIDER', ['jose']),
   PORT: withMessage(NumberFromString, () => '"PORT" should be a number'),
   JWT_SECRET: t.string,
 }
@@ -21,7 +20,7 @@ export const env = (value: Envs): string => {
   return pipe(
     envCodec.decode(process.env[value]),
     E.fold(
-      (errors) => { throw new ValidationError(failure(errors).join(':::')) },
+      (errors) => { throw new Error(failure(errors).join(':::')) },
       (value) => value,
     ),
   )
