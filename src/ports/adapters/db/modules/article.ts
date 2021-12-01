@@ -73,34 +73,45 @@ type GetArticlesFromDBInput = {
   userId: string
 }
 
-type GetArticlesFromDB = (input: GetArticlesFromDBInput) => Promise<DBArticle[]>
-export const getArticlesFromDB: GetArticlesFromDB = async ({ filter, userId }) => {
-  const articles = await db.getArticlesFromDB({ filter, userId })
-
-  return articles.map(article => ({
-    ...article,
-    author: {
-      username: article.author.username,
-      bio: article.author.bio ?? '',
-      image: article.author.image ?? '',
-      following: article.author.following,
-    },
-  }))
+type ArticlesResponse = {
+  articles: DBArticle[]
+  articlesCount: number
 }
 
-type GetArticlesFeedFromDB = (input: GetArticlesFromDBInput) => Promise<DBArticle[]>
-export const getArticlesFeedFromDB: GetArticlesFeedFromDB = async ({ filter, userId }) => {
-  const articles = await db.getArticlesFeedFromDB({ filter, userId })
+type GetArticlesFromDB = (input: GetArticlesFromDBInput) => Promise<ArticlesResponse>
+export const getArticlesFromDB: GetArticlesFromDB = async ({ filter, userId }) => {
+  const result = await db.getArticlesFromDB({ filter, userId })
 
-  return articles.map(article => ({
-    ...article,
-    author: {
-      username: article.author.username,
-      bio: article.author.bio ?? '',
-      image: article.author.image ?? '',
-      following: true,
-    },
-  }))
+  return {
+    ...result,
+    articles: result.articles.map(article => ({
+      ...article,
+      author: {
+        username: article.author.username,
+        bio: article.author.bio ?? '',
+        image: article.author.image ?? '',
+        following: article.author.following,
+      },
+    })),
+  }
+}
+
+type GetArticlesFeedFromDB = (input: GetArticlesFromDBInput) => Promise<ArticlesResponse>
+export const getArticlesFeedFromDB: GetArticlesFeedFromDB = async ({ filter, userId }) => {
+  const result = await db.getArticlesFeedFromDB({ filter, userId })
+
+  return {
+    ...result,
+    articles: result.articles.map(article => ({
+      ...article,
+      author: {
+        username: article.author.username,
+        bio: article.author.bio ?? '',
+        image: article.author.image ?? '',
+        following: true,
+      },
+    })),
+  }
 }
 
 export const deleteArticleFromDB = db.deleteArticleFromDB

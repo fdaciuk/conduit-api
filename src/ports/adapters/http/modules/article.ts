@@ -122,11 +122,14 @@ export function unfavoriteArticle (data: FavoriteArticleInput) {
     TE.mapLeft(getError),
   )
 }
-
-function getArticlesResponse (articles: DBArticle[]) {
+type GetArticlesResponseInput = {
+  articles: DBArticle[]
+  articlesCount: number
+}
+function getArticlesResponse ({ articles, articlesCount }: GetArticlesResponseInput) {
   return {
     articles,
-    articlesCount: articles.length,
+    articlesCount,
   }
 }
 
