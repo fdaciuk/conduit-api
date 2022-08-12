@@ -8,7 +8,7 @@ type Envs =
   | 'PORT'
   | 'JWT_SECRET'
 
-export const env = (value: Envs) => {
+export const env = (value: Envs): string => {
   const envCodec = withMessage(
     NonEmptyString,
     () => `You must set the env var ${value}`,
