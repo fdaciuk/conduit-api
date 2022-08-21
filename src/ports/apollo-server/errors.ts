@@ -26,11 +26,20 @@ const errors: Record<number, { code: string, name: string }> = {
 
 export class GraphQLError extends ApolloError {
   constructor (errorObject: ReturnType<typeof getError>) {
-    const message = errorObject.error.errors.body.join(':::')
+    const errorBody = errorObject.error.errors.body
+    const message = errorBody.length > 1
+      ? JSON.stringify(errorBody)
+      : errorBody.toString()
     const errorData = errors[errorObject.code]
     const code = errorData?.code ?? 'GRAPHQL_ERROR'
     const name = errorData?.name ?? 'GraphQLError'
+
     super(message, code)
     Object.defineProperty(this, 'name', { value: name })
+
+    if (code === 'VALIDATION_ERROR') {
+      const errorsKey = 'errors'
+      this[errorsKey] = errorBody
+    }
   }
 }

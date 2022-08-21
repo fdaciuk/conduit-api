@@ -3,9 +3,12 @@ import { join } from 'node:path'
 import { ApolloServer } from 'apollo-server'
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core'
 import { buildSchema } from 'type-graphql'
+import { env } from '@/helpers'
 
 import { Article } from './modules/article/article.type'
 import { repositories, authChecker } from './server'
+
+const PORT = env('PORT')
 
 export async function start () {
   const schema = await buildSchema({
@@ -32,7 +35,7 @@ export async function start () {
     ],
   })
 
-  return server.listen().then(({ url }) => {
+  return server.listen({ port: PORT }).then(({ url }) => {
     console.log(`🚀  Server ready at ${url}`)
   })
 }

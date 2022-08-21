@@ -51,7 +51,15 @@ async function tryAuth (req: Request) {
   )()
 }
 
-export const authChecker: AuthChecker<Context> = async ({ context }, roles) => {
+type Role =
+  | 'HALF_PUBLIC'
+  | 'PRIVATE'
+
+export const getRole = (role: Role = 'PRIVATE'): string => {
+  return role
+}
+
+export const authChecker: AuthChecker<Context, Role> = async ({ context }, roles) => {
   if (roles.includes('HALF_PUBLIC')) {
     await tryAuth(context.req)
     return true
