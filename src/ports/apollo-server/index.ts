@@ -1,55 +1,30 @@
 import 'reflect-metadata'
+import { join } from 'node:path'
 import { ApolloServer } from 'apollo-server'
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core'
-import {
-  Arg,
-  Field,
-  ObjectType,
-  Query,
-  Resolver,
-  buildSchema,
-} from 'type-graphql'
+import { buildSchema } from 'type-graphql'
 
-const books = [
-  {
-    title: 'Book 1',
-    description: 'book 1',
-  },
-
-  {
-    title: 'Book 2',
-    description: 'book 2',
-  },
-]
-
-@ObjectType('Book')
-class Book {
-  @Field()
-  title: string
-
-  @Field({ nullable: true })
-  description?: string
-}
-
-@Resolver(Book)
-class BookResolver {
-  @Query(_returns => [Book])
-  books () {
-    return books
-  }
-
-  @Query(_returns => Book, { nullable: true })
-  book (@Arg('title') title: string) {
-    return books.find(book => book.title === title)
-  }
-}
+import { Article } from './modules/article/article.type'
+import { repositories, authChecker } from './server'
 
 export async function start () {
   const schema = await buildSchema({
-    resolvers: [BookResolver],
+    orphanedTypes: [
+      Article,
+    ],
+    resolvers: [join(__dirname, '{modules,relay}', '**', '*.resolver.ts')],
+    emitSchemaFile: true,
+    authChecker,
   })
+
   const server = new ApolloServer({
     schema,
+    context: async ({ req }) => {
+      return {
+        repositories,
+        req,
+      }
+    },
     csrfPrevention: true,
     cache: 'bounded',
     plugins: [
