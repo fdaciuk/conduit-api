@@ -1,18 +1,18 @@
 import { pipe } from 'fp-ts/function'
 import * as E from 'fp-ts/Either'
-import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql'
+import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql'
 
 import * as user from '@/ports/adapters/http/modules/user'
 import { getPayload } from '@/ports/adapters/http/http'
 
 import { GraphQLError } from '@/ports/apollo-server/errors'
-import { Context } from '@/ports/apollo-server/server'
+import { Context, Auth } from '@/ports/apollo-server/server'
 import { User } from './user.type'
 import { CreateUserInput, LoginInput, UpdateUserInput } from './user.input'
 
 @Resolver(_of => User)
 export class UserResolver {
-  @Authorized()
+  @Auth()
   @Query(_returns => User)
   async me (@Ctx() context: Context): Promise<User> {
     const req = context.req
@@ -52,7 +52,7 @@ export class UserResolver {
     return result.right.user
   }
 
-  @Authorized()
+  @Auth()
   @Mutation(_returns => User)
   async updateUser (@Arg('input') input: UpdateUserInput, @Ctx() context: Context): Promise<User> {
     const req = context.req

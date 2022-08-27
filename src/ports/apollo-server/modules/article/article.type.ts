@@ -36,3 +36,9 @@ export class Article {
   @Field(_type => Int)
   favoritesCount: number
 }
+
+@ObjectType('ArticleDeleteResponse')
+export class ArticleDeleteResponse {
+  @Field()
+  success: boolean
+}

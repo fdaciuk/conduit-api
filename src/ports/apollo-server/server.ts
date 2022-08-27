@@ -2,7 +2,7 @@ import { Request as ExpressRequest } from 'express'
 import { pipe } from 'fp-ts/function'
 import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
-import { AuthChecker } from 'type-graphql'
+import { AuthChecker, Authorized } from 'type-graphql'
 
 import { JWTPayload } from '@/ports/adapters/jwt'
 
@@ -55,10 +55,6 @@ type Role =
   | 'HALF_PUBLIC'
   | 'PRIVATE'
 
-export const getRole = (role: Role = 'PRIVATE'): string => {
-  return role
-}
-
 export const authChecker: AuthChecker<Context, Role> = async ({ context }, roles) => {
   if (roles.includes('HALF_PUBLIC')) {
     await tryAuth(context.req)
@@ -68,3 +64,5 @@ export const authChecker: AuthChecker<Context, Role> = async ({ context }, roles
   await auth(context.req)
   return !!context.req.auth?.id
 }
+
+export const Auth = (...roles: Role[]) => Authorized(...roles)
