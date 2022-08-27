@@ -142,7 +142,7 @@ type GetUserResponse = (input: GetUserResponseInput) => UserResponse
 const getUserResponse: GetUserResponse = ({ user, token }) => ({
   user: {
     email: user.email,
-    token: token,
+    token,
     username: user.username,
     bio: user.bio ?? '',
     image: user.image ?? '',
