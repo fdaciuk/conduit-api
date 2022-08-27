@@ -5,7 +5,7 @@ import * as article from '@/ports/adapters/http/modules/article'
 import { Auth, Context, graphQLMapResult } from '@/ports/apollo-server/server'
 import { CreateArticleInput, UpdateArticleInput } from './article.input'
 import { Comment } from '@/ports/apollo-server/modules/comment/comment.type'
-import { Article, ArticleDeleteResponse } from './article.type'
+import { Article, ArticleDeleteResponse, ArticlesResponse } from './article.type'
 
 type ArticleResponse = Article & {
   userId: string
@@ -50,9 +50,28 @@ export class ArticleResolver {
   }
 
   @Auth('HALF_PUBLIC')
-  @Query(_returns => Article)
-  async articles () {
+  @Query(_returns => ArticlesResponse)
+  async articles (@Ctx() context: Context): Promise<ArticlesResponse> {
+    const req = context.req
+    const payload = getPayload(req.auth)
 
+    return pipe(
+      article.fetchArticlesFeed({
+        filter: req.query,
+        userId: payload.id,
+      }),
+      graphQLMapResult(result => ({
+        edges: result.articles.map(article => ({
+          ...article,
+          // TODO: Ver pq está dando erro nessas duas props
+          id: (article as any).id as string,
+          favorited: (article as any).favorited as boolean,
+          userId: payload.id,
+          comments: [],
+        })),
+        articlesCount: result.articlesCount,
+      })),
+    )
   }
 
   @Auth()

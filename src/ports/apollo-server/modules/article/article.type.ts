@@ -46,3 +46,12 @@ export class ArticleDeleteResponse {
   @Field()
   success: boolean
 }
+
+@ObjectType('ArticlesResponse')
+export class ArticlesResponse {
+  @Field(_type => [Article])
+  edges: Article[]
+
+  @Field()
+  articlesCount: number
+}
