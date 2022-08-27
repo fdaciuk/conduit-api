@@ -7,7 +7,7 @@ import { AuthChecker, Authorized } from 'type-graphql'
 import { JWTPayload } from '@/ports/adapters/jwt'
 
 import { authMiddleware } from '@/ports/adapters/http/http'
-import { GraphQLError } from './errors'
+import { GraphQLError, GraphQLErrorInput } from './errors'
 
 const repository = {
   async findOne (_id: string): Promise<void> {},
@@ -66,3 +66,19 @@ export const authChecker: AuthChecker<Context, Role> = async ({ context }, roles
 }
 
 export const Auth = (...roles: Role[]) => Authorized(...roles)
+
+type GraphQLMapResult = <E extends GraphQLErrorInput, A, B>
+  (mapFn: (a: A) => B) => (either: TE.TaskEither<E, A>) => Promise<B>
+
+export const graphQLMapResult: GraphQLMapResult = (mapFn) => async (either) => {
+  const result = await pipe(
+    either,
+    TE.map(mapFn),
+  )()
+
+  if (E.isLeft(result)) {
+    throw new GraphQLError(result.left)
+  }
+
+  return result.right
+}

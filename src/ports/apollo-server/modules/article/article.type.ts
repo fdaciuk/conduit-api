@@ -1,5 +1,6 @@
 import { Field, ID, Int, ObjectType } from 'type-graphql'
 import { Profile } from '@/ports/apollo-server/modules/profile/profile.type'
+import { Comment } from '@/ports/apollo-server/modules/comment/comment.type'
 
 @ObjectType('Article')
 export class Article {
@@ -29,6 +30,9 @@ export class Article {
 
   @Field(_type => Profile, { nullable: true })
   author?: Profile
+
+  @Field(_type => [Comment])
+  comments: Comment[]
 
   @Field()
   favorited: boolean

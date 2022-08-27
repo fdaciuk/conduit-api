@@ -24,8 +24,10 @@ const errors: Record<number, { code: string, name: string }> = {
   },
 }
 
+export type GraphQLErrorInput = ReturnType<typeof getError>
+
 export class GraphQLError extends ApolloError {
-  constructor (errorObject: ReturnType<typeof getError>) {
+  constructor (errorObject: GraphQLErrorInput) {
     const errorBody = errorObject.error.errors.body
     const message = errorBody.length > 1
       ? JSON.stringify(errorBody)

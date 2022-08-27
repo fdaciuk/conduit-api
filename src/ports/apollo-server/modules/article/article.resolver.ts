@@ -1,70 +1,94 @@
 import { pipe } from 'fp-ts/function'
-import * as E from 'fp-ts/Either'
-import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql'
+import { Arg, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql'
 import { getPayload } from '@/ports/adapters/http/http'
 import * as article from '@/ports/adapters/http/modules/article'
-import { Auth, Context } from '@/ports/apollo-server/server'
-import { GraphQLError } from '@/ports/apollo-server/errors'
+import { Auth, Context, graphQLMapResult } from '@/ports/apollo-server/server'
 import { CreateArticleInput, UpdateArticleInput } from './article.input'
+import { Comment } from '@/ports/apollo-server/modules/comment/comment.type'
 import { Article, ArticleDeleteResponse } from './article.type'
+
+type ArticleResponse = Article & {
+  userId: string
+}
 
 @Resolver(Article)
 export class ArticleResolver {
   @Auth('HALF_PUBLIC')
   @Query(_returns => Article)
-  async article (@Arg('slug') slug: string, @Ctx() context: Context): Promise<Article> {
+  async article (@Arg('slug') slug: string, @Ctx() context: Context): Promise<ArticleResponse> {
     const req = context.req
     const payload = getPayload(req.auth)
 
-    const result = await article.fetchArticle({
-      slug,
-      userId: payload.id,
-    })()
+    return pipe(
+      article.fetchArticle({
+        slug,
+        userId: payload.id,
+      }),
+      graphQLMapResult(result => ({
+        ...result.article,
+        // TODO: Ver pq está dando erro nessas duas props
+        id: (result.article as any).id as string,
+        favorited: (result.article as any).favorited as boolean,
+        userId: payload.id,
+        comments: [],
+      })),
+    )
+  }
 
-    if (E.isLeft(result)) {
-      throw new GraphQLError(result.left)
+  @FieldResolver()
+  async comments (@Root() parent: Article & { userId: string }): Promise<Comment[]> {
+    const data = {
+      slug: parent.slug,
+      userId: parent.userId,
     }
 
-    return {
-      ...result.right.article,
-      // TODO: Ver pq está dando erro nessas duas props
-      id: (result.right.article as any).id as string,
-      favorited: (result.right.article as any).favorited as boolean,
-    }
+    return pipe(
+      data,
+      article.getCommentsFromAnArticle,
+      graphQLMapResult(result => result.comments),
+    )
+  }
+
+  @Auth('HALF_PUBLIC')
+  @Query(_returns => Article)
+  async articles () {
+
   }
 
   @Auth()
   @Mutation(_returns => Article)
-  async createArticle (@Arg('input') input: CreateArticleInput, @Ctx() context: Context): Promise<Article> {
+  async createArticle (
+    @Arg('input') input: CreateArticleInput,
+    @Ctx() context: Context,
+  ): Promise<ArticleResponse> {
     const req = context.req
     const payload = getPayload(req.auth)
-    console.log('payload:', payload)
 
     const data = {
       ...input,
       authorId: payload.id,
     }
 
-    const result = await pipe(
+    return pipe(
       data as any,
       article.registerArticle,
-    )()
-
-    if (E.isLeft(result)) {
-      throw new GraphQLError(result.left)
-    }
-
-    return {
-      ...result.right.article,
-      // TODO: Ver pq está dando erro nessas duas props
-      id: (result.right.article as any).id as string,
-      favorited: (result.right.article as any).favorited as boolean,
-    }
+      graphQLMapResult(result => ({
+        ...result.article,
+        // TODO: Ver pq está dando erro nessas duas props
+        id: (result.article as any).id as string,
+        favorited: (result.article as any).favorited as boolean,
+        userId: payload.id,
+        comments: [],
+      })),
+    )
   }
 
   @Auth()
   @Mutation(_returns => Article)
-  async updateArticle (@Arg('input') input: UpdateArticleInput, @Ctx() context: Context): Promise<Article> {
+  async updateArticle (
+    @Arg('input') input: UpdateArticleInput,
+    @Ctx() context: Context,
+  ): Promise<ArticleResponse> {
     const req = context.req
     const payload = getPayload(req.auth)
 
@@ -73,21 +97,18 @@ export class ArticleResolver {
       authorId: payload.id,
     }
 
-    const result = await pipe(
+    return pipe(
       data as any,
       article.updateArticle,
-    )()
-
-    if (E.isLeft(result)) {
-      throw new GraphQLError(result.left)
-    }
-
-    return {
-      ...result.right.article,
-      // TODO: Ver pq está dando erro nessas duas props
-      id: (result.right.article as any).id as string,
-      favorited: (result.right.article as any).favorited as boolean,
-    }
+      graphQLMapResult(result => ({
+        ...result.article,
+        // TODO: Ver pq está dando erro nessas duas props
+        id: (result.article as any).id as string,
+        favorited: (result.article as any).favorited as boolean,
+        userId: payload.id,
+        comments: [],
+      })),
+    )
   }
 
   @Auth()
@@ -99,17 +120,12 @@ export class ArticleResolver {
     const req = context.req
     const payload = getPayload(req.auth)
 
-    const result = await pipe(
+    return pipe(
       article.deleteArticle({
         slug,
         userId: payload.id,
       }),
-    )()
-
-    if (E.isLeft(result)) {
-      throw new GraphQLError(result.left)
-    }
-
-    return { success: true }
+      graphQLMapResult(_ => ({ success: true })),
+    )
   }
 }

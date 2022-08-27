@@ -1,10 +1,8 @@
 import { pipe } from 'fp-ts/function'
-import * as E from 'fp-ts/Either'
 import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql'
 import { getPayload } from '@/ports/adapters/http/http'
 import * as user from '@/ports/adapters/http/modules/user'
-import { Auth, Context } from '@/ports/apollo-server/server'
-import { GraphQLError } from '@/ports/apollo-server/errors'
+import { Auth, Context, graphQLMapResult } from '@/ports/apollo-server/server'
 import { Profile } from './profile.type'
 
 @Resolver(Profile)
@@ -15,18 +13,13 @@ export class ProfileResolver {
     const req = context.req
     const payload = getPayload(req.auth)
 
-    const result = await pipe(
+    return pipe(
       user.getProfile({
         username,
         userId: payload.id,
       }),
-    )()
-
-    if (E.isLeft(result)) {
-      throw new GraphQLError(result.left)
-    }
-
-    return result.right.profile
+      graphQLMapResult(result => result.profile),
+    )
   }
 
   @Auth()
@@ -35,18 +28,13 @@ export class ProfileResolver {
     const req = context.req
     const payload = getPayload(req.auth)
 
-    const result = await pipe(
+    return pipe(
       user.followUser({
         userToFollow,
         userId: payload.id,
       }),
-    )()
-
-    if (E.isLeft(result)) {
-      throw new GraphQLError(result.left)
-    }
-
-    return result.right.profile
+      graphQLMapResult(result => result.profile),
+    )
   }
 
   @Auth()
@@ -55,17 +43,12 @@ export class ProfileResolver {
     const req = context.req
     const payload = getPayload(req.auth)
 
-    const result = await pipe(
+    return pipe(
       user.unfollowUser({
         userToUnfollow,
         userId: payload.id,
       }),
-    )()
-
-    if (E.isLeft(result)) {
-      throw new GraphQLError(result.left)
-    }
-
-    return result.right.profile
+      graphQLMapResult(result => result.profile),
+    )
   }
 }
