@@ -29,3 +29,27 @@ export class UpdateArticleInput {
   @Field({ nullable: true })
   body?: string
 }
+
+@InputType()
+class ArticlesFeedFilterInput {
+  @Field({ nullable: true })
+  author?: string
+
+  @Field({ nullable: true })
+  tag?: string
+
+  @Field({ nullable: true })
+  favorited?: string
+
+  @Field({ nullable: true })
+  limit?: number
+
+  @Field({ nullable: true })
+  offset?: number
+}
+
+@InputType()
+export class ArticlesFeedInput {
+  @Field(_type => ArticlesFeedFilterInput, { nullable: true })
+  filter?: ArticlesFeedFilterInput
+}
