@@ -55,3 +55,39 @@ export class ArticlesResponse {
   @Field()
   articlesCount: number
 }
+
+// ===
+// Relay compilant
+// ===
+// @ObjectType('ArticlesEdge')
+// class ArticleEdge {
+//   @Field(_type => Article)
+//   node: Article
+
+//   @Field()
+//   cursor: string
+// }
+
+// @ObjectType('ArticlePageInfo')
+// class ArticlePageInfo {
+//   @Field()
+//   hasNextPage: boolean
+
+//   @Field()
+//   hasPreviousPage: boolean
+
+//   @Field()
+//   startCursor: string
+
+//   @Field()
+//   endCursor: string
+// }
+
+// @ObjectType('ArticlesConnection')
+// export class ArticlesConnection {
+//   @Field(_type => [ArticleEdge])
+//   edges: ArticleEdge[]
+
+//   @Field(_type => ArticlePageInfo)
+//   pageInfo: ArticlePageInfo
+// }

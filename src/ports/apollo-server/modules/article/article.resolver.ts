@@ -147,4 +147,54 @@ export class ArticleResolver {
       graphQLMapResult(_ => ({ success: true })),
     )
   }
+
+  @Auth()
+  @Mutation(_returns => Article)
+  async favoriteArticle (
+    @Arg('slug') slug: string,
+    @Ctx() context: Context,
+  ): Promise<Article> {
+    const req = context.req
+    const payload = getPayload(req.auth)
+
+    return pipe(
+      article.favoriteArticle({
+        userId: payload.id,
+        slug,
+      }),
+      graphQLMapResult(result => ({
+        ...result.article,
+        // TODO: Ver pq está dando erro nessas duas props
+        id: (result.article as any).id as string,
+        favorited: (result.article as any).favorited as boolean,
+        userId: payload.id,
+        comments: [],
+      })),
+    )
+  }
+
+  @Auth()
+  @Mutation(_returns => Article)
+  async unfavoriteArticle (
+    @Arg('slug') slug: string,
+    @Ctx() context: Context,
+  ): Promise<Article> {
+    const req = context.req
+    const payload = getPayload(req.auth)
+
+    return pipe(
+      article.unfavoriteArticle({
+        userId: payload.id,
+        slug,
+      }),
+      graphQLMapResult(result => ({
+        ...result.article,
+        // TODO: Ver pq está dando erro nessas duas props
+        id: (result.article as any).id as string,
+        favorited: (result.article as any).favorited as boolean,
+        userId: payload.id,
+        comments: [],
+      })),
+    )
+  }
 }
