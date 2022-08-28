@@ -18,3 +18,9 @@ export class Comment {
   @Field(_type => Profile, { nullable: true })
   author?: Profile
 }
+
+@ObjectType('CommentDeleteResponse')
+export class CommentDeleteResponse {
+  @Field()
+  success: boolean
+}

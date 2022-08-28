@@ -1,4 +1,4 @@
-import { Field, InputType } from 'type-graphql'
+import { Field, ID, InputType } from 'type-graphql'
 
 @InputType()
 export class AddCommentToAnArticleInput {
@@ -7,4 +7,13 @@ export class AddCommentToAnArticleInput {
 
   @Field()
   articleSlug: string
+}
+
+@InputType()
+export class DeleteCommentInput {
+  @Field()
+  articleSlug: string
+
+  @Field(_type => ID)
+  id: number
 }

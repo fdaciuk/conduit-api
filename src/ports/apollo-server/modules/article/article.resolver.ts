@@ -56,7 +56,7 @@ export class ArticleResolver {
     const payload = getPayload(req.auth)
 
     return pipe(
-      article.fetchArticlesFeed({
+      article.fetchArticles({
         filter: req.query,
         userId: payload.id,
       }),
