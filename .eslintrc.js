@@ -6,6 +6,7 @@ module.exports = {
   extends: [
     'plugin:jest/recommended',
     'standard',
+    'prettier',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
