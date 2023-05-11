@@ -1,3 +1,3 @@
-import { start } from '@/ports/fastify'
+import { start } from '@/ports/apollo-server'
 
 start()

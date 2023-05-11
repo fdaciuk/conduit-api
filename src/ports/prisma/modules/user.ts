@@ -44,7 +44,7 @@ export const updateUserInDB: UpdateUserInDB<User> = (id) => async (data) => {
   try {
     const user = await prisma.user.update({
       where: {
-        id: id,
+        id,
       },
       data: {
         email: data.email,
@@ -89,7 +89,7 @@ export const getProfileFromDB: GetProfileFromDB<User> = async (username) => {
   })
 
   if (!profile) {
-    throw new ForbiddenError(`User ${username} does not exist`)
+    throw new NotFoundError(`User ${username} does not exist`)
   }
 
   return {
@@ -106,7 +106,7 @@ export const followUser: FollowUser<User> = async ({ userToFollow, userId }) => 
   })
 
   if (!userToFollowData) {
-    throw new ForbiddenError(`User ${userToFollow} does not exist`)
+    throw new NotFoundError(`User ${userToFollow} does not exist`)
   }
 
   if (userToFollowData.id === userId) {
@@ -131,7 +131,7 @@ export const followUser: FollowUser<User> = async ({ userToFollow, userId }) => 
   })
 
   if (!profile) {
-    throw new ForbiddenError(`User ${userToFollow} does not exist`)
+    throw new NotFoundError(`User ${userToFollow} does not exist`)
   }
 
   return {
@@ -148,7 +148,7 @@ export const unfollowUser: UnfollowUser<User> = async ({ userToUnfollow, userId 
   })
 
   if (!userToUnfollowData) {
-    throw new ForbiddenError(`User ${userToUnfollow} does not exist`)
+    throw new NotFoundError(`User ${userToUnfollow} does not exist`)
   }
 
   if (userToUnfollowData.id === userId) {
@@ -173,7 +173,7 @@ export const unfollowUser: UnfollowUser<User> = async ({ userToUnfollow, userId 
   })
 
   if (!profile) {
-    throw new ForbiddenError(`User ${userToUnfollow} does not exist`)
+    throw new NotFoundError(`User ${userToUnfollow} does not exist`)
   }
 
   return {

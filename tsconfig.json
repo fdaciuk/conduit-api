@@ -15,6 +15,10 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noPropertyAccessFromIndexSignature": true,
+    "strictPropertyInitialization": false,
+
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
 
     "moduleResolution": "node",
     "baseUrl": ".",

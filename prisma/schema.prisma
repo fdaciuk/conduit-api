@@ -31,8 +31,8 @@ model User {
 model Follower {
   userId         String
   followingId    String
-  whoIsFollowing User    @relation("Follower", fields: [followingId], references: [id])
-  following      User    @relation("Following", fields: [userId], references: [id])
+  whoIsFollowing User   @relation("Follower", fields: [followingId], references: [id])
+  following      User   @relation("Following", fields: [userId], references: [id])
 
   @@id([userId, followingId])
 }
